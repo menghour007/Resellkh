@@ -7,23 +7,33 @@ export default function DealMethod({ location, setLocation, telegram, setTelegra
   const [showLocationInput, setShowLocationInput] = useState(false);
 
   useEffect(() => {
-    // Only update if no current location
-    if (!location) {
-      const saved = localStorage.getItem('meetup_location');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        const name = parsed.name || `${parsed.lat}, ${parsed.lng}`;
-        setLocation(name);
-        setShowLocationInput(true);
-      }
+    // Get location from location page
+    const saved = localStorage.getItem('meetup_location');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      const name = parsed.name || `${parsed.lat}, ${parsed.lng}`;
+      setLocation(name);
+      setShowLocationInput(true);
+
+      // Replace the saved form draft with this new location
+      const draft = JSON.parse(localStorage.getItem('sell_form_draft') || '{}');
+      draft.location = name;
+      localStorage.setItem('sell_form_draft', JSON.stringify(draft));
+
+      // Clear this so it doesn't auto-run on refresh
+      localStorage.removeItem('meetup_location');
     }
-  }, [location, setLocation]);
+
+    // Show input if there's already a value
+    if (location) {
+      setShowLocationInput(true);
+    }
+  }, []);
 
   return (
     <div className="p-5 border rounded-3xl bg-white space-y-4">
       <p className="font-semibold text-lg">Deal Method</p>
 
-      {/* Meet-up */}
       <div>
         <p className="text-sm font-medium mb-1">Meet-up</p>
         {!showLocationInput ? (
@@ -46,7 +56,6 @@ export default function DealMethod({ location, setLocation, telegram, setTelegra
         )}
       </div>
 
-      {/* Telegram */}
       <div>
         <p className="text-sm font-medium mb-1">Telegram</p>
         <input
