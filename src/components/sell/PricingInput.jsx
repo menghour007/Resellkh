@@ -3,8 +3,14 @@ import { useState } from 'react';
 export default function PricingInput({ price, setPrice, discount, setDiscount }) {
   const [currency, setCurrency] = useState('USD');
 
+  // const discountValue =
+  //   price && discount ? ((parseFloat(price) * parseFloat(discount)) / 100).toFixed(2) : '0.00';
+
   const discountValue =
-    price && discount ? ((parseFloat(price) * parseFloat(discount)) / 100).toFixed(2) : '0.00';
+    price && discount
+      ? ((price * discount) / 100).toFixed(2)
+      : '0.00';
+
 
   return (
     <div className="space-y-6">
@@ -35,17 +41,15 @@ export default function PricingInput({ price, setPrice, discount, setDiscount })
           <div className="flex items-center h-[48px] bg-[#f1edef] rounded-2xl p-1">
             <button
               onClick={() => setCurrency('USD')}
-              className={`h-full px-4 py-2 rounded-2xl text-sm font-semibold ${
-                currency === 'USD' ? 'bg-white text-black' : 'text-gray-800'
-              }`}
+              className={`h-full px-4 py-2 rounded-2xl text-sm font-semibold ${currency === 'USD' ? 'bg-white text-black' : 'text-gray-800'
+                }`}
             >
               $
             </button>
             <button
               onClick={() => setCurrency('KHR')}
-              className={`h-full px-4 py-2 rounded-2xl text-sm font-semibold ${
-                currency === 'KHR' ? 'bg-white text-black' : 'text-gray-800'
-              }`}
+              className={`h-full px-4 py-2 rounded-2xl text-sm font-semibold ${currency === 'KHR' ? 'bg-white text-black' : 'text-gray-800'
+                }`}
             >
               R
             </button>
@@ -64,10 +68,13 @@ export default function PricingInput({ price, setPrice, discount, setDiscount })
               type="number"
               inputMode="decimal"
               min="0"
+              max="100"
               value={discount}
               onChange={(e) => {
                 const value = e.target.value;
-                if (/^\d*\.?\d*$/.test(value)) setDiscount(value);
+                if (/^\d{0,3}(\.\d{0,2})?$/.test(value) && parseFloat(value) <= 100) {
+                  setDiscount(value);
+                }
               }}
               placeholder="0"
               className="w-full h-[48px] pt-4 pl-10 pr-4 py-3 rounded-2xl bg-[#f1edef] text-black placeholder:text-gray-800 focus:outline-none"
@@ -75,11 +82,18 @@ export default function PricingInput({ price, setPrice, discount, setDiscount })
           </div>
 
           {/* Discount Value Display */}
-          <div className="h-[48px] px-4 py-3 min-w-[90px] rounded-2xl  bg-[#f1edef] text-black text-sm font-medium text-center flex items-center justify-center">
-            {discountValue} <span className="ml-1 text-gray-600">{currency === 'USD' ? '$' : 'R'}</span>
+          <div
+            className={`h-[48px] px-4 py-3 min-w-[90px] rounded-2xl border text-sm font-medium text-center flex items-center justify-center ${parseFloat(discount) === 100 ? 'text-green-500' : 'text-black'
+              }`}
+          >
+            {parseFloat(discount) === 100
+              ? 'Free'
+              : `- ${discountValue} ${currency === 'USD' ? '$' : 'R'}`}
           </div>
+
         </div>
       </div>
+
     </div>
   );
 }

@@ -143,7 +143,7 @@ export default function ListingsWithFilter() {
 
         {/* Filter Panel */}
         {showFilter && (
-          <div className="relative z-20 w-full lg:right-[147px] md:absolute md:right-[110px] md:w-[310px] bg-white border rounded-2xl shadow p-4 mb-4 md:mb-0">
+          <div className="relative z-50 w-full lg:right-[147px] md:absolute md:right-[110px] md:w-[310px] bg-white border rounded-2xl shadow p-4 mb-4 md:mb-0">
             <div className="text-sm font-medium text-gray-700 mb-2">Sort</div>
             <div className="space-y-1 mb-3">
               <label className="block"><input type="radio" name="sort" value="" checked={sortBy === ""} onChange={() => setSortBy("")} /> Recent</label>

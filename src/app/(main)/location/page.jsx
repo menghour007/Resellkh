@@ -1,43 +1,41 @@
 'use client';
-import { useState } from 'react';
-import { MapPin } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
-export default function LocationPage() {
-  const [selectedLocation, setSelectedLocation] = useState(null);
+export default function SelectLocationPage() {
+  const router = useRouter();
 
   const handleConfirm = () => {
-    alert('Location confirmed!');
-    // You can also pass coordinates to a context or localStorage here
+    const mockLocation = {
+      lat: 11.562108,
+      lng: 104.888535,
+      name: 'National University of Management',
+    };
+
+    localStorage.setItem('meetup_location', JSON.stringify(mockLocation));
+    router.back(); // Go back to the previous page
   };
 
   return (
-    <main className="w-full h-screen relative">
-      {/* Embedded Google Map */}
-      <iframe
-        title="Google Map"
-        width="100%"
-        height="100%"
-        frameBorder="0"
-        style={{ border: 0 }}
-        referrerPolicy="no-referrer-when-downgrade"
-        src="https://www.google.com/maps/embed/v1/place?q=Phnom+Penh,Cambodia&key=YOUR_GOOGLE_MAPS_API_KEY"
-        allowFullScreen
-      ></iframe>
+    <>
+      <div className="relative w-full h-[530px] px-[7%] py-4 mb-[40px]">
+        {/* Map iframe */}
+        <iframe
+          src="https://maps.google.com/maps?q=national%20university%20of%20management%20phnom%20penh&z=15&output=embed"
+          className="w-full h-[520px] border-none rounded-2xl"
+          allowFullScreen
+          loading="lazy"
+        />
 
-      {/* Red Map Pin (center) */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-full z-10">
-        <MapPin className="text-red-600 w-10 h-10" />
+        {/* Confirm Button (overlay) */}
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10">
+          <button
+            onClick={handleConfirm}
+            className="bg-orange-500 text-white font-semibold px-6 py-2 rounded-full shadow hover:bg-orange-600 transition"
+          >
+            Confirm
+          </button>
+        </div>
       </div>
-
-      {/* Confirm Button */}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10">
-        <button
-          onClick={handleConfirm}
-          className="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-6 py-2 rounded-full shadow-lg"
-        >
-          Confirm
-        </button>
-      </div>
-    </main>
+    </>
   );
 }
