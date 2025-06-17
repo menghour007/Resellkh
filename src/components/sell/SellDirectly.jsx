@@ -43,7 +43,7 @@ const directSellCategories = [
 
 export default function SellDirectly() {
   return (
-    <div className="bg-[#E4E4E4] p-6 rounded-3xl shadow-sm">
+    <div className="bg-[#E4E4E4] p-6 rounded-3xl">
       {/* <div className="flex items-center mb-6">
         <h2 className="text-xl font-bold text-gray-800">Sell Directly</h2>
         <span className="ml-2 bg-orange-500 text-white text-xs font-semibold px-2.5 py-0.5 rounded-full">Beta</span>
