@@ -32,7 +32,7 @@ const SellerInfo = () => {
       <div className="text-sm text-gray-600 mb-4">
         <p>Tel: +855 97 416939</p>
       </div>
-      <a href="https://t.me/echandevid">
+      <a href="">
       <button className="w-full bg-orange-500 text-white py-2 rounded-[50px] font-medium hover:bg-orange-600 transition-colors">
         Telegram
       </button>
