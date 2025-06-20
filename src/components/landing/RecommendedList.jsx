@@ -1,8 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
-import { FiBookmark } from "react-icons/fi";
 import ProductCart from "../domain/ProductCart";
 
 const recommendedItems = [
@@ -418,13 +416,13 @@ export default function RecommendedList() {
   const itemsToShow = recommendedItems.slice(0, visibleCount);
 
   return (
-    <section className="w-full bg-white py-10">
+    <section className="w-full pt-[5px] md:pt-[40px] lg:pt-[40px] mb-[40px]">
       <div className="w-full">
-        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-6">
+        <h2 className="text-xl sm:text-xl font-bold text-gray-900 mb-4">
           Recommended For You
         </h2>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 px-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-[60] justify-items-center">
+        <div className="grid grid-cols-2 px-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-[26] justify-items-center">
           {itemsToShow.map((item) => {
             const price =
               typeof item.productPrice === "number"
@@ -454,7 +452,7 @@ export default function RecommendedList() {
           <div className="text-center mt-8">
             <button
               onClick={handleViewMore}
-              className="px-6 py-2 bg-orange-500 text-white rounded-full hover:bg-orange-600 transition"
+              className="px-6 py-2 mt-2 bg-orange-500 text-white rounded-full hover:bg-orange-600 transition"
             >
               View more
             </button>

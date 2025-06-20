@@ -1,97 +1,104 @@
 'use client';
 
 import { useState } from 'react';
-import ProductCard from './ProductCard';
+// import ProductCard from './ProductCard';
+import ProductCart from '../domain/ProductCart';
 
 const allProducts = [
   {
     id: 1,
-    image: '/Product-Detail-Image/more-1.png',
+    imageUrl: '/Product-Detail-Image/more-1.png',
     title: 'Vintage White Hoodie',
     description: 'Comfortable vintage style hoodie...',
-    price: '7',
-    originalPrice: null,
+    productPrice: 7,
+
   },
   {
     id: 2,
-    image: '/Product-Detail-Image/more-2.png',
+    imageUrl: '/Product-Detail-Image/more-2.png',
     title: 'Coho Hoodie in brown',
     description: 'Coho Hoodie in brown...',
-    price: '12',
-    originalPrice: '25',
+    productPrice: 45,
   },
   {
     id: 3,
-    image: '/Product-Detail-Image/more-3.png',
+    imageUrl: '/Product-Detail-Image/more-3.png',
     title: 'Brandy Melville Graphic Hoodie',
     description: 'Graphic Hoodie size one size...',
-    price: '22',
-    originalPrice: null,
+    productPrice: 22,
+
   },
   {
     id: 4,
-    image: '/Product-Detail-Image/more-4.png',
+    imageUrl: '/Product-Detail-Image/more-4.png',
     title: 'Brandy Hoodie',
     description: 'Brandy Melville Hoodie...',
-    price: '15',
-    originalPrice: null,
+    productPrice: 15,
+
   },
   {
     id: 5,
-    image: '/Product-Detail-Image/more-5.png',
+    imageUrl: '/Product-Detail-Image/more-5.png',
     title: 'OCT 100% cotton beige Hoodies',
     description: 'Beige cotton hoodie...',
-    price: '18',
-    originalPrice: null,
+    productPrice: 18,
+
   },
   {
     id: 6,
-    image: '/Product-Detail-Image/more-6.png',
+    imageUrl: '/Product-Detail-Image/more-6.png',
     title: 'Classic Black Hoodie',
     description: 'Simple black hoodie...',
-    price: '25',
-    originalPrice: '30',
+    productPrice: 25,
+    discountPercent: 10,
   },
   {
     id: 7,
-    image: '/Product-Detail-Image/more-7.png',
+    imageUrl: '/Product-Detail-Image/more-7.png',
     title: 'Urban Street Hoodie',
     description: 'Street-style hoodie...',
-    price: '35',
-    originalPrice: null,
+    productPrice: 35,
+
   },
   {
     id: 8,
-    image: '/Product-Detail-Image/more-8.png',
+    imageUrl: '/Product-Detail-Image/more-8.png',
     title: 'Tie-Dye Hoodie',
     description: 'Trendy tie-dye pattern...',
-    price: '40',
-    originalPrice: '45',
+    productPrice: 40,
+    discountPercent: 45,
   },
   {
     id: 9,
-    image: '/Product-Detail-Image/more-9.png',
+    imageUrl: '/Product-Detail-Image/more-9.png',
     title: 'Khaki Zip Hoodie',
     description: 'Full-zip khaki hoodie...',
-    price: '28',
-    originalPrice: null,
+    productPrice: 28,
+
   },
   {
     id: 10,
-    image: '/Product-Detail-Image/more-10.png',
+    imageUrl: '/Product-Detail-Image/more-10.png',
     title: 'Oversized Fleece Hoodie',
     description: 'Warm fleece hoodie...',
-    price: '32',
-    originalPrice: null,
+    productPrice: 32,
+
   },
   {
     id: 11,
-    image: '/Product-Detail-Image/more-11.png',
+    imageUrl: '/Product-Detail-Image/more-4.png',
     title: 'Oversized Fleece Hoodie',
     description: 'Warm fleece hoodie...',
-    price: '32',
-    originalPrice: '40',
-  }
+    productPrice: 32,
+    discountPercent: 40,
+  },
+  {
+    id: 12,
+    imageUrl: '/Product-Detail-Image/more-5.png',
+    title: 'Tie-Dye Hoodie',
+    description: 'Trendy tie-dye pattern...',
+    productPrice: 40,
+  },
 ];
 
 const PRODUCTS_PER_LOAD = 10;
@@ -103,42 +110,42 @@ const OtherProducts = () => {
     setVisibleCount((prev) => prev + PRODUCTS_PER_LOAD);
   };
 
-  const getDiscountText = (price, originalPrice) => {
-    const numericPrice = parseFloat(price);
-    const numericOriginal = parseFloat(originalPrice);
-    if (!isNaN(numericPrice) && !isNaN(numericOriginal) && numericOriginal > numericPrice) {
-      const discount = Math.round(((numericOriginal - numericPrice) / numericOriginal) * 100);
-      return `${discount}% OFF`;
-    }
-    return null;
-  };
-
   const visibleProducts = allProducts.slice(0, visibleCount);
 
   return (
-    <section className="mb-12">
+    <section className="mb-12 md:mt-12 lg:mt-12">
       <h2 className="text-xl font-bold text-gray-900 mb-6">Other products you may like</h2>
+      <div className="grid grid-cols-2 px-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-[26] justify-items-center">
+        {visibleProducts.map((item) => {
+          const price =
+            typeof item.productPrice === "number"
+              ? item.discountPercent
+                ? (item.productPrice * (100 - item.discountPercent)) / 100
+                : item.productPrice
+              : 0;
 
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
-        {visibleProducts.map((product) => (
-          <ProductCard
-            key={product.id}
-            id={product.id}
-            imageUrl={product.image}
-            title={product.title}
-            description={product.description}
-            price={product.price}
-            originalPrice={product.originalPrice}
-            discountText={getDiscountText(product.price, product.originalPrice)}
-          />
-        ))}
+          return (
+            <ProductCart
+              key={item.id}
+              id={item.id}
+              imageUrl={item.imageUrl}
+              title={item.title}
+              description={item.description}
+              price={price.toFixed(2)}
+              originalPrice={item.discountPercent ? item.productPrice : null}
+              discountText={
+                item.discountPercent ? `${item.discountPercent}% OFF` : null
+              }
+            />
+          );
+        })}
       </div>
 
       {visibleCount < allProducts.length && (
         <div className="text-center mt-8">
           <button
             onClick={handleLoadMore}
-            className="bg-orange-500 text-white px-8 py-3 rounded-full font-medium hover:bg-orange-600 transition-colors"
+            className="px-6 py-2 mt-2 bg-orange-500 text-white rounded-full hover:bg-orange-600 transition"
           >
             View more
           </button>

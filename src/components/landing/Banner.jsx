@@ -2,17 +2,17 @@ import Image from "next/image";
 
 export default function Banner() {
   return (
-    <section className="w-full bg-white py-10 px-4">
-      <div className="max-w-[1200px] mx-auto flex flex-col md:flex-row items-start justify-between gap-10">
-        <div className="w-full md:w-1/2 text-center md:text-left">
-          <h1 className="text-[32px] sm:text-[40px] md:text-[48px] font-bold text-gray-900 font-[Poppins] leading-tight mb-3">
+    <section className="w-full py-[70] ">
+      <div className="max-w-auto mx-auto flex flex-col md:flex-row items-start justify-between gap-[45] ">
+        <div className="w-full md:w-1/2 lg:w-[70%] text-center md:text-left">
+          <h1 className="text-[27px] lg:text-[35px] md:text-[24px] font-bold text-gray-900 leading-tight mb-3">
             We help you shop smarter
           </h1>
-          <h2 className="text-[20px] sm:text-[28px] md:text-[32px] font-bold text-orange-500 font-[Poppins] mb-6 text-left ml-4 md:ml-20">
+          <h2 className="text-[20px] lg:text-[28px] md:text-[19px] ps-[50px] lg:ps-[160px] font-bold text-orange-500 font-[Poppins] mb-6 text-left ml-4 md:ml-20">
             one resold product at a time.
           </h2>
 
-          <p className="text-[16px] sm:text-[17px] md:text-[18px] font-[Poppins] text-gray-600 leading-relaxed max-w-md mx-auto md:mx-0">
+          <p className="text-[16px] lg:text-[16px] md:text-[13px] text-gray-600 leading-relaxed max-w-full mx-auto md:mx-0">
             Cambodia’s trusted online marketplace where buying and selling is
             fast, easy, and secure. Whether you're looking to declutter your
             home, start a side hustle, or find great deals on quality new and
@@ -20,7 +20,7 @@ export default function Banner() {
           </p>
         </div>
 
-        <div className="w-full md:w-1/2 flex items-center justify-center md:justify-end gap-4">
+        <div className="w-full md:w-1/2 flex items-center justify-center md:justify-end gap-4 pe-[1%] md:pe-[2%] lg:pe-[1.5%]">
           <div className="flex flex-col gap-4">
             <Image
               src="/images/banner/hero1.jpg"
@@ -38,21 +38,22 @@ export default function Banner() {
             />
           </div>
           <div className="relative w-[240px] h-[240px]">
-            <div className="absolute  top-2 left-2 w-full h-full z-0 rounded-xl overflow-hidden">
+            <div className="absolute top-[-30px] left-[20px] rounded-[24px] w-full h-full z-0 overflow-hidden">
               <Image
                 src="/images/banner/hero4.jpg"
                 alt="Blurred bg"
                 fill
-                className="object-cover opacity-60 blur-sm"
+                className="object-cover blur-[1%] "
               />
             </div>
-
+             <div className="absolute top-[10px] right-[9px] w-full h-full z-10 overflow-hidden">
             <Image
               src="/images/banner/hero3.jpg"
               alt="Main"
               fill
-              className="object-cover rounded-xl relative z-10 shadow-lg"
+              className=" object-cover left-3 rounded-xl z-10 shadow-lg"
             />
+            </div>
           </div>
         </div>
       </div>

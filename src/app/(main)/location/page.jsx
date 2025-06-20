@@ -1,6 +1,5 @@
 'use client';
 import { useRouter } from 'next/navigation';
-import Footer from '@/components/layout/Footer';
 
 export default function SelectLocationPage() {
   const router = useRouter();
@@ -18,11 +17,11 @@ export default function SelectLocationPage() {
 
   return (
     <>
-      <div className="relative w-full h-screen px-[7%] py-4">
+      <div className="relative w-full h-[530px] px-[7%] py-4 mb-[40px]">
         {/* Map iframe */}
         <iframe
           src="https://maps.google.com/maps?q=national%20university%20of%20management%20phnom%20penh&z=15&output=embed"
-          className="w-full h-full border-none rounded-2xl"
+          className="w-full h-[520px] border-none rounded-2xl"
           allowFullScreen
           loading="lazy"
         />
@@ -37,8 +36,6 @@ export default function SelectLocationPage() {
           </button>
         </div>
       </div>
-
-      <Footer />
     </>
   );
 }

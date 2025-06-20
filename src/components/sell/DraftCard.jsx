@@ -4,7 +4,7 @@ export default function DraftCard({ draft }) {
   return (
     <div className="rounded-2xl overflow-hidden shadow-sm border border-gray-200 bg-white flex flex-col">
       {/* Image */}
-      <div className="w-full aspect-[4/5] relative">
+      <div className="w-full aspect-[4/5] relative h-[260px]">
         <Image
           src={draft.imageUrl}
           alt={draft.alt}

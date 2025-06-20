@@ -75,7 +75,8 @@ export default function ImageScanModal({ open, onClose }) {
           <img src={preview} alt="Preview" className="h-full object-contain" />
         ) : (
           <>
-            <FiImage size={36} />
+            {/* <FiImage size={36} /> */}
+            <img src="/images/story set/image.jpg" alt="" className='w-[40px]' />
             <p className="mt-2 text-sm text-center">
               Drag an image here or{' '}
               <span

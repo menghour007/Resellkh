@@ -13,6 +13,10 @@ const categories = [
   { name: "Shoes", image: "/images/category/shoes.jpg" },
   { name: "Sports", image: "/images/category/sports.jpg" },
   { name: "Sneakers", image: "/images/category/sneakers.jpg" },
+  { name: "Jewelry", image: "/images/category/jewelry.jpg" },
+  { name: "Shoes", image: "/images/category/shoes.jpg" },
+  { name: "Sports", image: "/images/category/sports.jpg" },
+  { name: "Sneakers", image: "/images/category/sneakers.jpg" },
 ];
 
 export default function CategorySlider() {
@@ -26,12 +30,12 @@ export default function CategorySlider() {
   };
 
   return (
-    <section className="w-full bg-white py-10">
+    <section className="w-full pt-[10px]">
       <div className="w-full">
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
-          <h2 className="text-xl font-bold text-gray-900">
-            What would you like to find?
-          </h2>
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-[15] mb-3">
+          <h2 className="text-xl sm:text-xl font-bold text-gray-900">
+           What would you like to find?
+        </h2>
           <div className="flex gap-2 self-start sm:self-auto">
             <button
               onClick={() => scroll("left")}
@@ -50,7 +54,7 @@ export default function CategorySlider() {
 
         <div
           ref={scrollRef}
-          className="flex gap-[60] overflow-x-auto scroll-smooth no-scrollbar pb-1"
+          className="flex gap-[49] overflow-x-auto scroll-smooth no-scrollbar px-[2px] pb-1"
         >
           {categories.map((cat, index) => (
             <div

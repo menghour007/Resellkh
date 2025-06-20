@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import Footer from '@/components/layout/Footer';
+import Link from 'next/link';
 
 const mockMedia = [
   '/Product-Detail-Image/image1.png',
@@ -34,10 +34,27 @@ export default function FullscreenMediaPage({ params }) {
 
   return (
     <>
+      <div className="flex items-center justify-between ps-[7%] mt-3 pr-4">
+        {/* Breadcrumb on the Right */}
+        <div className="flex items-center text-gray-500">
+          <Link href="/" className="hover:text-black">Home</Link>
+          <svg className='mx-1' width="20" height="20" viewBox="0 0 20 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M6.98558 5.06864C7.32339 4.7931 7.8211 4.8128 8.13643 5.12775L13.0048 9.99638C13.1679 10.1596 13.2563 10.3779 13.2563 10.6044C13.2563 10.8309 13.1681 11.0488 13.0048 11.2127L8.13633 16.0811C7.80004 16.417 7.2557 16.417 6.92029 16.0811C6.58388 15.7451 6.58388 15.2006 6.92019 14.8648L11.1802 10.6044L6.92029 6.34407C6.60492 6.02908 6.5852 5.53088 6.86112 5.19302L6.92025 5.12769L6.98558 5.06864Z" fill="#343A40" />
+          </svg>
+
+          <span className="text-orange-500 cursor-default">Detail</span>
+        </div>
+        {/* Close Button on the Left */}
+        <button
+          onClick={closePage}
+          className="text-gray-500 pe-[7%] hover:text-black text-2xl"
+        >
+          ✕
+        </button>
+      </div>
+
       <main className="bg-white min-h-screen px-4 sm:px-6 lg:px-[7%] py-6 text-black">
-        <nav className="text-sm text-gray-500 mb-6">
-          <span>Home</span> / <span className="text-orange-500">Detail</span>
-        </nav>
+
 
         <div className="relative flex flex-col items-center justify-center">
           {/* Left arrow */}
@@ -53,7 +70,7 @@ export default function FullscreenMediaPage({ params }) {
           )}
 
           {/* Main media */}
-          <div className="relative w-[376px] h-[376px] rounded-2xl overflow-hidden">
+          <div className="relative w-[376px] h-[376px] md:w-[500px] md:h-[400px] rounded-2xl overflow-hidden">
             {isVideo ? (
               <video
                 src={media}
@@ -68,7 +85,7 @@ export default function FullscreenMediaPage({ params }) {
                 alt={`media-${index}`}
                 width={376}
                 height={376}
-                className="object-cover rounded-2xl"
+                className="object-cover rounded-2xl w-full"
                 priority
               />
             )}
@@ -86,13 +103,7 @@ export default function FullscreenMediaPage({ params }) {
             </button>
           )}
 
-          {/* Close button */}
-          <button
-            onClick={closePage}
-            className="absolute top-0 right-0 mt-2 mr-2 text-gray-500 hover:text-black text-2xl"
-          >
-            ×
-          </button>
+
         </div>
 
         {/* Thumbnails */}
@@ -101,9 +112,8 @@ export default function FullscreenMediaPage({ params }) {
             <button
               key={i}
               onClick={() => goTo(i)}
-              className={`relative w-[94px] h-[94px] rounded-xl overflow-hidden border-2 ${
-                i === index ? 'border-orange-500' : 'border-gray-300 hover:border-gray-400'
-              }`}
+              className={`relative w-[94px] h-[94px] rounded-xl overflow-hidden border-2 ${i === index ? 'border-orange-500' : 'border-gray-300 hover:border-gray-400'
+                }`}
             >
               {item.endsWith('.mp4') ? (
                 <>
@@ -129,7 +139,6 @@ export default function FullscreenMediaPage({ params }) {
           ))}
         </div>
       </main>
-      <Footer />
     </>
   );
 }

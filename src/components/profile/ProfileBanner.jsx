@@ -1,15 +1,14 @@
 'use client';
 import Image from 'next/image';
 import { FaStar } from 'react-icons/fa';
-
+import Link from 'next/link';
 export default function ProfileBanner({ isOwner, user }) {
   const {
     name = 'Bou Leakhena',
     avatar = '/images/avatar.jpg',
-
     cover = 'cover.jpg',
-    rating = null,
-    reviewsCount = null,
+    rating = 4.5,
+    reviewsCount = 59,
   } = user || {};
 
   return (
@@ -64,10 +63,14 @@ export default function ProfileBanner({ isOwner, user }) {
 
           {isOwner && (
             <button className="border px-4 py-1 rounded-full text-sm hover:bg-gray-100">
-              Edit Profile
+              <Link href="/profile/edit-profile">Edit Profile</Link>
+               
             </button>
           )}
+
+
         </div>
+
       </div>
     </div>
   );

@@ -2,7 +2,7 @@ import ProductCart from "./ProductCart";
 export default function ProductCartList() {
 
     const products = [
-    {
+      {
       id: 1,
       imageUrl: "/images/product/cropped_hoodie.jpg",
       title: "Asics x Jound GT-2160 ",

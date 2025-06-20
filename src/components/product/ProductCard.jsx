@@ -21,6 +21,7 @@ export default function ProductCart({
 
   return (
     <div className="flex flex-col bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden transition-transform hover:scale-[1.01] w-full sm:w-[240px] max-w-sm">
+
       {/* Image Section */}
       <div className="relative w-full aspect-[4/3] sm:h-[240px]">
         {discountText && (

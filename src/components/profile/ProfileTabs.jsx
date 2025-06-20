@@ -1,11 +1,7 @@
-
-import { useState } from "react";
 import ListingsWithFilter from "./ListingWithFilter";
 import ReviewsSection from "./ReviewsSection";
 
-export default function ProfileTabs() {
-  const [activeTab, setActiveTab] = useState("listings");
-
+export default function ProfileTabs({ activeTab, setActiveTab }) {
   return (
     <div className="w-full py-8">
       <div className="flex px-6 space-x-6 mb-4">
@@ -31,7 +27,11 @@ export default function ProfileTabs() {
         </button>
       </div>
 
-      {activeTab === "listings" ? <ListingsWithFilter /> : <ReviewsSection />}
+      {activeTab === "listings" ? (
+        <ListingsWithFilter />
+      ) : (
+       <ReviewsSection setActiveTab={setActiveTab} />
+      )}
     </div>
   );
 }

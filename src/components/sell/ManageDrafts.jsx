@@ -6,16 +6,17 @@ const userDrafts = [
   { id: 2, imageUrl: "/Sell/draft2.png", alt: "Beige high-heels" },
   { id: 3, imageUrl: "/Sell/draft3.png", alt: "Gray zip-up hoodie" },
   { id: 4, imageUrl: "/Sell/draft4.png", alt: "Blue handbag" },
-  { id: 5, imageUrl: "/Sell/draft5.png", alt: "Black jacket" },
+  { id: 5, imageUrl: "/Sell/draft4.png", alt: "Black jacket" },
 ];
 
 export default function ManageDrafts() {
   return (
     <section>
       <div className="flex items-center justify-between mb-4">
-        <button className="bg-orange-500 text-white font-semibold py-1 px-4 rounded-lg hover:bg-orange-600 transition-colors">
+        {/* <button className="px-6 py-2 mt-2 bg-orange-500 text-white rounded-full hover:bg-orange-600 transition">
           Manage Drafts
-        </button>
+        </button> */}
+        <p className='text-[17px] font-semibold'>Manage Drafts</p>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
         {userDrafts.map((draft) => (

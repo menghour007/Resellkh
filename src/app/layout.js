@@ -29,11 +29,18 @@
   
 // }
 
-// src/app/layout.js (REQUIRED)
-// src/app/layout.js or src/app/(main)/layout.js
-import './globals.css';
-import ClientLayout from './ClientLayout';
 
+import { Book } from 'lucide-react';
+import './globals.css';
+import { Poppins } from "next/font/google";
+import { BookmarkProvider } from '@/context/BookmarkContext';
+import { Toaster } from "react-hot-toast";
+
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-poppins",
+});
 export const metadata = {
   title: 'ResellKH',
   description: 'Cambodia’s resale platform',
@@ -42,8 +49,11 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body>
+      <body className="font-sans">
+        <BookmarkProvider >
+          <Toaster position="right-bottom" reverseOrder={false} />
         {children}
+        </BookmarkProvider>
       </body>
     </html>
   );

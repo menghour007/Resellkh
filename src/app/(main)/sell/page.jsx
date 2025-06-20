@@ -8,8 +8,8 @@ export default function SellDashboardPage() {
     <>
      
         <div className="mx-auto px-[7%] py-8">
-            <h1 className="text-2xl font-bold text-gray-800 mb-1">List it yourself</h1>
-            <h2 className="text-2xl font-bold text-gray-800 mb-6">Find your own buyers</h2>
+            <h1 className="text-xl font-semibold text-gray-800 mb-1">List it yourself</h1>
+            <h2 className="text-xl font-semibold text-gray-800 mb-6">Find your own buyers</h2>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
 
@@ -49,8 +49,6 @@ export default function SellDashboardPage() {
             <ManageDrafts />
           </div>
         </div>
-
-        <Footer />
       
     </>
   );

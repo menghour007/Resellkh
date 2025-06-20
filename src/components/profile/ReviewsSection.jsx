@@ -6,68 +6,64 @@ import { FaStar } from 'react-icons/fa';
 const reviewsData = [
   {
     id: 1,
-    name: 'Molly',
-    date: 'May 8, 2025',
+    name: "Molly",
+    date: "2025-05-08",
     rating: 5,
-    comment:
-      "great and friendly seller, and the dress i bought was even better than i had expected.. it's probably is the prettiest thing i own in my closet now. super happy with my item! ♡",
-    avatar: '/images/profile/girl 1.jpg',
+    comment: "Great and friendly seller, and the dress I bought was even better than I had expected. It's probably the prettiest thing I own in my closet now. Super happy with my item!",
+    avatar: "/images/profile/Mollyy.jpg"
   },
   {
     id: 2,
-    name: 'Rofath Nii',
-    date: 'Mar 22, 2025',
-    rating: 4,
-    comment: 'great seller & pleasant exp 💗',
-    avatar: '/images/profile/no_pic.jpg',
+    name: "Rofath Nii",
+    date: "2025-03-22",
+    rating: 5,
+    comment: "Great seller & pleasant exp 💕",
+    avatar: "/images/profile/Rofath Nii.jpg"
   },
   {
     id: 3,
-    name: 'Rofath Nii',
-    date: 'Mar 22, 2025',
+    name: "Engelina",
+    date: "2025-03-18",
     rating: 4,
-    comment: 'great seller & pleasant exp 💗',
-    avatar: '/images/profile/no_pic.jpg',
+    comment: "Seller was very nice and kind, tho meeting up can be quite troublesome. I'm thankful she still made the effort to pass me the shirt after her work! Thank you.",
+    avatar: "/images/profile/Engelina.jpg"
   },
   {
     id: 4,
-    name: 'Engelina',
-    date: 'Mar 16, 2025',
+    name: "Christari",
+    date: "2025-03-16",
     rating: 5,
-    comment:
-      'seller was very nice and kind, tho meeting was short she still made the effort to pass the item 😇',
-    avatar: '/images/profile/girl 3.jpg',
+    comment: "Nice and friendly seller that can deal with you. Straightforward transaction. Seller was friendly and flexible with the meetup location. Appreciate the kind gesture too.",
+    avatar: "/images/profile/Christari.jpg"
   },
   {
     id: 5,
-    name: 'Engelina',
-    date: 'Mar 16, 2025',
+    name: "chitorita chu",
+    date: "2025-03-22",
     rating: 5,
-    comment:
-      'seller was very nice and kind, tho meeting was short she still made the effort to pass the item 😇',
-    avatar: '/images/profile/girl 3.jpg',
+    comment: "Smooth transaction & trust worthy! Recommended seller.",
+    avatar: "/images/profile/rabbit.jpg"
   },
   {
     id: 6,
-    name: 'Molly',
-    date: 'May 8, 2025',
+    name: "Heng Yew Chye",
+    date: "2025-03-16",
     rating: 5,
-    comment:
-      "great and friendly seller, and the dress i bought was even better than i had expected.. it's probably is the prettiest thing i own in my closet now. super happy with my item! ♡",
-    avatar: '/images/profile/girl 1.jpg',
+    comment: "Adorable socks of great quality and fantastic price! Seller sent out so quickly — we received it the very next day in the mailbox! Really really appreciate! Thanks so much :)",
+    avatar: "/images/profile/Heng Yew Chye.jpg"
   },
   {
     id: 7,
-    name: 'Molly',
-    date: 'May 8, 2025',
+    name: "Christa",
+    date: "2025-03-16",
     rating: 5,
-    comment:
-      "great and friendly seller, and the dress i bought was even better than i had expected.. it's probably is the prettiest thing i own in my closet now. super happy with my item! ♡",
-    avatar: '/images/profile/girl 1.jpg',
-  },
+    comment: "Fast to deal with. Great seller.",
+    avatar: "/images/profile/Christa.jpg"
+  }
 ];
 
-const ReviewsSection = () => {
+
+const ReviewsSection = ({ setActiveTab }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [sortOrder, setSortOrder] = useState('Newest');
 
@@ -77,7 +73,7 @@ const ReviewsSection = () => {
     return sortOrder === 'Newest' ? dateB - dateA : dateA - dateB;
   });
 
-  const [visibleCount, setVisibleCount] = useState(3); 
+  const [visibleCount, setVisibleCount] = useState(3);
 
   const handleViewMore = () => {
     setVisibleCount((prev) => prev + 3); // load 3 more on each click
@@ -194,23 +190,24 @@ const ReviewsSection = () => {
                       </div>
                     )}
                   </div>
-
-
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium">{review.name}</span>
-                      <div className="flex space-x-1 text-orange-400 text-sm">
-                        {[...Array(5)].map((_, i) => (
-                          <FaStar
-                            key={i}
-                            className={i < review.rating ? 'text-orange-500' : 'text-gray-300'}
-                          />
-                        ))}
+                  <div className="flex-1">
+                    <div className="mb-1">
+                      <h4 className="font-semibold text-gray-900">{review.name}</h4>
+                      <div className="flex items-center space-x-5 mt-1">
+                        <div className="flex text-sm">
+                          {[...Array(5)].map((_, i) => (
+                            <FaStar
+                              key={i}
+                              className={i < review.rating ? 'text-orange-500' : 'text-gray-300'}
+                            />
+                          ))}
+                        </div>
+                        <span className="text-xs text-gray-500">{review.date}</span>
                       </div>
-                      <span className="text-sm text-gray-400">{review.date}</span>
                     </div>
-                    <p className="mt-1 text-sm text-gray-700">{review.comment}</p>
+                    <p className="text-gray-700 text-sm leading-relaxed">{review.comment}</p>
                   </div>
+
                 </div>
               ))}
             </div>

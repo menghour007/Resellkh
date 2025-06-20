@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { FaFacebook, FaTiktok, FaTelegramPlane } from "react-icons/fa";
+import Link from "next/link";
 
 export default function Footer() {
   return (
@@ -10,7 +11,9 @@ export default function Footer() {
         {/* Logo + Description */}
         <div>
           <div className="flex items-center gap-2 mb-4">
+            <Link href="/">
             <Image src="/Logo.png" alt="ResellKH Logo" width={100} height={50} />
+            </Link>
           </div>
           <p className="text-sm text-gray-600 leading-relaxed">
             We provide high-quality services and products to meet your needs.

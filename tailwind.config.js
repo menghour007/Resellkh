@@ -13,12 +13,12 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    "./src/**/*.{js,ts,jsx,tsx}", // <- Important for src/ structure
+    "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
     extend: {
       fontFamily: {
-        poppins: ["Poppins", "sans-serif"],
+        sans: ["Poppins", "sans-serif"],
         quicksand: ["Quicksand", "sans-serif"],
         oxygen: ["Oxygen", "sans-serif"],
       },

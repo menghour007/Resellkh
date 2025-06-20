@@ -1,7 +1,7 @@
 export default function ItemDetailForm({ title, setTitle, description, setDescription }) {
   return (
     <div className="p-5 border rounded-3xl bg-white space-y-4">
-      <p className="font-semibold text-lg">Item Detail</p>
+      <p className="font-semibold text-[17px]">Item Detail</p>
 
       {/* Title input */}
       <input
@@ -9,7 +9,7 @@ export default function ItemDetailForm({ title, setTitle, description, setDescri
         placeholder="Listing title"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
-        className="w-full rounded-2xl bg-gray-100 px-5 py-3 placeholder-gray-500 text-gray-800 focus:outline-none"
+        className="w-full rounded-2xl bg-[#f1edef] px-5 py-3 placeholder-gray-500 text-gray-800 focus:outline-none"
       />
 
       {/* Tip */}
@@ -24,7 +24,7 @@ export default function ItemDetailForm({ title, setTitle, description, setDescri
           rows={5}
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          className="w-full rounded-2xl bg-gray-100 px-5 py-3 placeholder-gray-500 text-gray-800 resize-none focus:outline-none"
+          className="w-full rounded-2xl bg-[#f1edef] px-5 py-3 placeholder-gray-500 text-gray-800 resize-none focus:outline-none"
         />
         <p className="text-sm text-gray-500 absolute bottom-2 right-4">{description.length}/150 words</p>
       </div>

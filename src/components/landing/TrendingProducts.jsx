@@ -6,44 +6,43 @@ import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 
 const trendingItems = [
   {
-    id: 1,
+    id: 100,
     imageUrl: "/images/trending/shoe1.jpg",
     title: "Asics x Jound GT-2160",
-    description: "Selling a pair of lightly used Asics x JJJJound GT-2160s...",
+    description: "Selling a pair of lightly used",
     productPrice: 219,
   },
   {
-    id: 2,
+    id: 101,
     imageUrl: "/images/trending/shoe2.jpg",
     title: "ASICS Gel Nimbus 26",
     description: "No box but used less than 5 times...",
     productPrice: 150,
-    originalPrice: 180,
     discountPercent: 15,
   },
   {
-    id: 3,
+    id: 102,
     imageUrl: "/images/trending/shoe3.jpg",
     title: "Men's Asics Gel-Cumulus",
     description: "Very good condition Asics Gel-Cumulus...",
     productPrice: 50,
   },
   {
-    id: 4,
+    id: 103,
     imageUrl: "/images/trending/shoe4.jpg",
     title: "ASICS Japanese Edition Denims",
     description: "Barely worn special denim edition...",
     productPrice: 100,
   },
   {
-    id: 5,
+    id: 104,
     imageUrl: "/images/trending/shoe5.jpg",
     title: "New Balance 327",
     description: "Size 36.5. Used once only.",
     productPrice: 32,
   },
   {
-    id: 6,
+    id: 105,
     imageUrl: "/images/recommended/charles.jpg",
     title: "Charles & Keith Leather Metallic",
     description:
@@ -51,23 +50,22 @@ const trendingItems = [
     productPrice: 29,
   },
   {
-    id: 7,
+    id: 106,
     imageUrl: "/images/recommended/bike.jpg",
     title: "French Carbon Engineer Bicycle",
     description: "Highly negotiable. Used once only. Bicycle too small for me.",
     productPrice: 500,
   },
   {
-    id: 8,
+    id: 107,
     imageUrl: "/images/recommended/bracelet.jpg",
     title: "H Bracelet",
     description: "Genuine titanium steel H bracelet. Condition: 10/10",
     productPrice: 30,
-    originalPrice: 50,
     discountPercent: 40,
   },
   {
-    id: 9,
+    id: 108,
     imageUrl: "/images/recommended/cloudbag.jpg",
     title: "White Puffer Cloud Bag",
     description:
@@ -75,24 +73,23 @@ const trendingItems = [
     productPrice: 5,
   },
   {
-    id: 10,
+    id: 109,
     imageUrl: "/images/recommended/lululemon.jpg",
     title: "Lululemon Cropped Full Zip",
     description:
       "Brand new white knitted top – washed but never worn. Free size, fits up to UK6 well.",
     productPrice: 7.5,
-    originalPrice: 15,
     discountPercent: 50,
   },
   {
-    id: 11,
+    id: 110,
     imageUrl: "/images/recommended/miu_sweats.jpg",
     title: "Miu Miu Logo Sweatpants",
     description: "Retail SGD 1,960. Excellent condition (see pictures).",
     productPrice: 5,
   },
   {
-    id: 12,
+    id: 111,
     imageUrl: "/images/recommended/title.jpg",
     title: "UNIQLOCK Montu Shirt XLv",
     description: "Montu Blue Palm Leaf Shirt XLv. Casual with pearl button.",
@@ -111,11 +108,13 @@ export default function TrendingNow() {
   };
 
   return (
-    <section className="w-full bg-white py-10">
-      <div className="w-full">
+    <section className="w-full pt-[50px]">
+      <div className="w-full ">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
-          <h2 className="text-xl font-bold text-gray-900">Trending now</h2>
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-[15] mb-2 lg">
+          <h2 className="text-xl sm:text-xl font-bold text-gray-900 ">
+            Trending now
+          </h2>
           <div className="flex gap-2 self-start sm:self-auto">
             <button
               onClick={() => scroll("left")}
@@ -135,7 +134,7 @@ export default function TrendingNow() {
         {/* Scrollable Cards */}
         <div
           ref={scrollRef}
-          className="flex gap-6 overflow-x-auto scroll-smooth no-scrollbar pb-1"
+          className="flex gap-[26] overflow-x-auto scroll-smooth no-scrollbar px-[2px] py-1"
         >
           {trendingItems.map((item) => {
             const price =
@@ -148,7 +147,8 @@ export default function TrendingNow() {
             return (
               <div
                 key={item.id}
-                className="flex-shrink-0 w-[90%] sm:w-[45%] md:w-[30%] lg:w-[23%] xl:w-[18%] max-w-[240px] mx-auto"
+                // className="flex-shrink-0 min-w-[240px] max-w-[240px] h-[352px]"
+                className="flex-shrink-0 w-[211px] sm:w-[230px] md:w-[220px] lg:w-[240px] h-[340px]"
               >
                 <ProductCart
                   id={item.id}
@@ -160,9 +160,7 @@ export default function TrendingNow() {
                     item.discountPercent ? item.productPrice : null
                   }
                   discountText={
-                    item.discountPercent
-                      ? `${item.discountPercent}% OFF`
-                      : null
+                    item.discountPercent ? `${item.discountPercent}% OFF` : null
                   }
                 />
               </div>

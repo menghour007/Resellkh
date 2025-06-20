@@ -62,11 +62,11 @@ const ReviewFormModal = ({ isOpen, onClose, onSubmit }) => {
             <button
               key={star}
               onClick={() => handleStarClick(star)}
-              className="text-gray-300 hover:text-yellow-400 transition-colors"
+              className="text-gray-300 hover:text-orange-500 transition-colors"
               aria-label={`Rate ${star} stars`}
             >
               <svg
-                className={`w-8 h-8 ${rating >= star ? 'text-yellow-400' : 'text-gray-300'}`}
+                className={`w-8 h-8 ${rating >= star ? 'text-orange-500' : 'text-gray-300'}`}
                 fill="currentColor"
                 viewBox="0 0 24 24"
               >
@@ -89,18 +89,17 @@ const ReviewFormModal = ({ isOpen, onClose, onSubmit }) => {
           {/* Action Buttons */}
           <div className="flex justify-end space-x-4 mt-6">
             <button
-              type="button"
-              onClick={onClose}
-              className="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-6 py-3 bg-orange-500 text-white rounded-lg font-medium hover:bg-orange-600 transition-colors"
-            >
-              Post
-            </button>
+            onClick={onClose}
+            className="px-6 py-2 border border-gray-300 text-gray-800 rounded-full hover:bg-gray-200"
+          >
+            Cancel
+          </button>
+          <button
+           type="submit"
+            className="px-6 py-2 bg-orange-500 text-white rounded-full hover:bg-orange-600"
+          >
+            Post
+          </button>
           </div>
         </form>
       </div>

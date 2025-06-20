@@ -1,55 +1,46 @@
 'use client';
 
 import { FiMail } from "react-icons/fi";
+import Input from "@/components/ui/Input"; // Make sure path is correct
 
 export default function ForgotPassword() {
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row items-center justify-center px-4 md:px-12 lg:px-20 py-10 bg-white">
+    <div className="min-h-screen bg-white flex flex-col lg:flex-row items-center justify-center px-4 md:px-12 lg:px-[170px] py-10">
       {/* Left Illustration */}
-      <div className="hidden lg:flex w-1/2 justify-center">
+      <div className="hidden lg:flex w-1/2 justify-between">
         <img
-          src="/forgotpassword.png"
+          src="/images/auth/forgot password.jpg"
           alt="Forgot password illustration"
-          className="max-w-md w-full h-auto"
+          className="max-w-[430px] h-auto"
         />
       </div>
 
       {/* Right Form */}
       <div className="w-full lg:w-1/2 max-w-md space-y-6">
         {/* Logo */}
-        <div className="flex justify-center">
-          <img src="/LOGO.png" alt="Logo" className="h-12" />
+        <div className="flex justify-center mb-12">
+           <img src="/images/auth/logo.jpg" alt="logo" className='w-[130px]' />
         </div>
 
         {/* Title & Description */}
         <div className="text-center lg:text-left">
-          <h1 className="text-2xl font-bold text-gray-900">Forgot Password</h1>
+          <h1 className="text-xl font-semibold text-gray-900">Forgot Password</h1>
           <p className="text-sm text-gray-600 mt-2">
-            Enter your email for the verification process. We will send a 4-digit code to your email.
+            Enter your email for the verification process. We will send a 6 digit code to your email.
           </p>
         </div>
 
-        {/* Static Form (action redirects to OTP page with email) */}
-        <form
-          method="GET"
-          action="/verify-forgotpassword"
-          className="space-y-4"
-        >
-          <div className="text-left">
-            <label htmlFor="email" className="block mb-1 text-sm font-medium text-gray-700">
-              Email
-            </label>
-            <div className="relative">
-              <input
-                id="email"
-                type="email"
-                name="email"
-                placeholder="Enter your email"
-                required
-                className="w-full p-3 pl-4 pr-10 border rounded-full outline-none focus:ring-2 focus:ring-orange-400 placeholder-gray-400"
-              />
-              <FiMail className="absolute right-4 top-3.5 text-gray-400" />
-            </div>
+        {/* Form */}
+        <form method="GET" action="/verify-forgotpassword" className="space-y-4">
+          <div className="relative">
+            <Input
+              label="Email"
+              name="email"
+              type="email"
+              placeholder="Enter your email"
+              required
+            />
+            <FiMail className="absolute right-4 top-[38px] text-gray-400 text-lg" />
           </div>
 
           <button

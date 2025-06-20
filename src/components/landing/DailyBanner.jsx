@@ -2,11 +2,11 @@ import Image from "next/image";
 
 export default function DailyBanner() {
   return (
-    <section className="w-full bg-[#f7f2f5] py-10 px-4 rounded-[40px]">
+    <section className="w-full bg-[#f7f2f5] py-[70] rounded-[40px] mb-7">
       <div className="max-w-[1200px] mx-auto flex flex-col lg:flex-row items-center justify-between gap-8 font-quicksand">
         {/* Text Section */}
         <div className="flex-1 text-center lg:text-left">
-          <h2 className="text-[20px] sm:text-[30px] md:text-[35px] font-bold text-gray-900 leading-snug mb-4">
+          <h2 className="text-[15px] md:text-[20px] lg:text-[25px] font-bold text-gray-900 leading-snug mb-4">
             Your daily resell marketplace — shop
             <br className="hidden sm:block" />
             or sell second-hand today.
@@ -20,7 +20,7 @@ export default function DailyBanner() {
 
         {/* Image Section */}
         <div className="w-full lg:w-[480px] relative flex justify-center items-center">
-          <div className="absolute top-0 left-0 rounded-3xl overflow-hidden shadow-md w-[180px] h-[180px]">
+          <div className="absolute top-0 left-0 rounded-3xl overflow-hidden shadow-md w-[150px] h-[150px] md:w-[180px] md:h-[180px] lg:w-[190px] lg:h-[190px]">
             <Image
               src="/images/banner/banner1.jpg"
               alt="bg1"
@@ -28,7 +28,7 @@ export default function DailyBanner() {
               className="object-cover"
             />
           </div>
-          <div className="absolute top-0 right-0 rounded-3xl overflow-hidden shadow-md w-[180px] h-[180px]">
+          <div className="absolute top-0 right-0 rounded-3xl overflow-hidden shadow-md w-[150px] h-[150px] md:w-[180px] md:h-[180px] lg:w-[190px] lg:h-[190px]">
             <Image
               src="/images/banner/banner2.jpg"
               alt="bg2"
@@ -36,7 +36,7 @@ export default function DailyBanner() {
               className="object-cover"
             />
           </div>
-          <div className="relative top-[40px] rounded-3xl overflow-hidden shadow-lg w-[200px] h-[200px] z-10">
+          <div className="relative top-[40px] rounded-3xl overflow-hidden shadow-lg w-[150px] h-[150px] md:w-[180px] md:h-[180px] lg:w-[200px] lg:h-[200px] z-10">
             <Image
               src="/images/banner/banner3.jpg"
               alt="bg3"
