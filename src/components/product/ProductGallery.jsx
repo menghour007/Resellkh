@@ -38,13 +38,23 @@ const ProductGallery = ({ product }) => {
               ${selectedImageIndex === index ? 'border-orange-500 ring-2 ring-orange-500' : 'border-gray-200 hover:border-gray-300'}
             `}
           >
-            <Image
-              src={itemSrc}
-              alt={`Product thumbnail ${index + 1}`}
-              width={70}
-              height={70}
-              className="object-cover w-full h-full"
-            />
+            {itemSrc.endsWith('.mp4') ? (
+              <video
+                src={itemSrc}
+                className="object-cover w-full h-full"
+                muted
+                playsInline
+              />
+            ) : (
+              <Image
+                src={itemSrc}
+                alt={`Product thumbnail ${index + 1}`}
+                width={70}
+                height={70}
+                className="object-cover w-full h-full"
+              />
+            )}
+  
             {itemSrc.endsWith('.mp4') && (
               <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40">
                 <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
