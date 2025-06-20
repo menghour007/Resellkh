@@ -39,8 +39,9 @@ export default function ForgotPassword() {
               type="email"
               placeholder="Enter your email"
               required
+              
             />
-            <FiMail className="absolute right-4 top-[38px] text-gray-400 text-lg" />
+            {/* <FiMail className="absolute right-4 top-[38px] text-gray-400 text-lg" /> */}
           </div>
 
           <button

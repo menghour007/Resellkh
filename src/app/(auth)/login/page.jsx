@@ -4,7 +4,8 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { HiOutlineEye, HiOutlineEyeOff } from 'react-icons/hi';
-import Input from '@/components/ui/Input'; // ✅ make sure path is correct
+import InputFillPassword from '@/components/ui/InputFillPassword'; // ✅ make sure path is correct
+import Input from '@/components/ui/Input';
 
 export default function LoginForm() {
   const [email, setEmail] = useState('');
@@ -56,7 +57,7 @@ export default function LoginForm() {
 
             {/* Password */}
             <div className="relative">
-              <Input
+              <InputFillPassword
                 label="Password"
                 name="password"
                 type={showPassword ? 'text' : 'password'}
@@ -64,13 +65,7 @@ export default function LoginForm() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"
               />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-[38px] text-gray-500 text-xl"
-              >
-                {showPassword ? <HiOutlineEyeOff /> : <HiOutlineEye />}
-              </button>
+              
               <div className="text-right mt-1">
                 <a href="/forgotpassword" className="text-sm text-gray-500 hover:text-orange-500">
                   Forgot Password?

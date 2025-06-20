@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Input from "@/components/ui/Input";
+import InputFillPassword from "@/components/ui/InputFillPassword";
 import { HiOutlineEye, HiOutlineEyeOff } from "react-icons/hi";
 import { useRouter } from "next/navigation";
 
@@ -134,7 +135,7 @@ export default function Register() {
           </div>
 
           <div className="relative w-full h-[77px]">
-            <Input
+            <InputFillPassword
               label="Password"
               type={showPassword ? "text" : "password"}
               name="password"
@@ -143,20 +144,14 @@ export default function Register() {
               onBlur={handleBlur}
               placeholder="Enter your password"
             />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute top-[38px] right-4 text-xl text-gray-500"
-            >
-              {showPassword ? <HiOutlineEyeOff /> : <HiOutlineEye />}
-            </button>
+           
             {errors.password && (
               <p className="text-[12px] text-red-500 mt-[-14px]">{errors.password}</p>
             )}
           </div>
 
           <div className="relative w-full h-[77px]">
-            <Input
+            <InputFillPassword
               label="Confirm Password"
               type={showConfirm ? "text" : "password"}
               name="confirmPassword"
@@ -165,13 +160,7 @@ export default function Register() {
               onBlur={handleBlur}
               placeholder="Confirm your password"
             />
-            <button
-              type="button"
-              onClick={() => setShowConfirm(!showConfirm)}
-              className="absolute top-[38px] right-4 text-xl text-gray-500"
-            >
-              {showConfirm ? <HiOutlineEyeOff /> : <HiOutlineEye />}
-            </button>
+            
             {errors.confirmPassword && (
               <p className="text-[12px] text-red-500 mt-[-14px]">{errors.confirmPassword}</p>
             )}

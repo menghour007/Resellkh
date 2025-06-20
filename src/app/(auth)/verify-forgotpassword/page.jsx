@@ -1,5 +1,6 @@
 'use client';
 
+import { Delete } from "lucide-react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import toast from 'react-hot-toast';
@@ -31,7 +32,24 @@ export default function OTPVerification() {
     }
   };
 
-  
+  // clearing OTP boxes one at a time
+  const handleKeyDown = (e, index) => {
+  if (e.key === "Backspace") {
+    const newOtp = [...otp];
+    if (newOtp[index]) {
+      newOtp[index] = "";
+      setOtp(newOtp);
+    }
+    else if (index > 0) {
+      const prevIndex = index - 1;
+      newOtp[prevIndex] = "";
+      setOtp(newOtp);
+      const prevInput = document.getElementById(`otp-${prevIndex}`);
+      if (prevInput) prevInput.focus();
+    }
+  }
+};
+
 
 const handleVerify = async () => {
   const code = otp.join("");
@@ -94,6 +112,7 @@ const handleVerify = async () => {
               maxLength="1"
               value={digit}
               onChange={(e) => handleChange(e.target.value, idx)}
+              onKeyDown={(e) => handleKeyDown(e, idx)}
               className="w-12 h-12 border-b-2 text-center text-xl outline-none focus:border-orange-500 transition"
             />
           ))}
