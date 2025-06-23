@@ -24,7 +24,9 @@ export default function AuthNavbar() {
   const router = useRouter();
   const pathname = usePathname();
   const [categoryOpen, setCategoryOpen] = useState(false);
-  const categoryRef = useRef(null);
+  const desktopCategoryRef = useRef(null);
+const mobileCategoryRef = useRef(null);
+
 
   const categoryMap = {
     fashion: 1,
@@ -38,22 +40,22 @@ export default function AuthNavbar() {
     vehicle: 9,
   };
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (profileRef.current && !profileRef.current.contains(event.target)) {
-        setProfileOpen(false);
-      }
+  // useEffect(() => {
+  //   const handleClickOutside = (event) => {
+  //     if (profileRef.current && !profileRef.current.contains(event.target)) {
+  //       setProfileOpen(false);
+  //     }
 
-      if (categoryRef.current && !categoryRef.current.contains(event.target)) {
-        setCategoryOpen(false);
-      }
-    };
+  //     if (categoryRef.current && !categoryRef.current.contains(event.target)) {
+  //       setCategoryOpen(false);
+  //     }
+  //   };
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+  //   document.addEventListener("mousedown", handleClickOutside);
+  //   return () => {
+  //     document.removeEventListener("mousedown", handleClickOutside);
+  //   };
+  // }, []);
 
   useEffect(() => {
     const checkToken = () => {
@@ -81,18 +83,30 @@ export default function AuthNavbar() {
     setShowLogoutModal(false);
   }, [pathname]);
 
-  // Close dropdown on click outside
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (profileRef.current && !profileRef.current.contains(event.target)) {
-        setProfileOpen(false);
-      }
-    };
-
-    if (profileOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
+  const handleClickOutside = (event) => {
+    // Close profile dropdown
+    if (profileRef.current && !profileRef.current.contains(event.target)) {
+      setProfileOpen(false);
     }
-  }, []);
+
+    // Close category dropdowns (both desktop and mobile)
+    if (
+      desktopCategoryRef.current &&
+      !desktopCategoryRef.current.contains(event.target) &&
+      mobileCategoryRef.current &&
+      !mobileCategoryRef.current.contains(event.target)
+    ) {
+      setCategoryOpen(false);
+    }
+  };
+
+  document.addEventListener("mousedown", handleClickOutside);
+  return () => {
+    document.removeEventListener("mousedown", handleClickOutside);
+  };
+}, []);
+
 
   return (
     <div className="w-full sticky top-0 z-[200] bg-white px-[7%] py-4">
@@ -136,7 +150,7 @@ export default function AuthNavbar() {
             >
               Book
             </Link>
-            <div className="relative" ref={categoryRef}>
+            <div className="relative" ref={desktopCategoryRef}>
               <button
                 onClick={() => setCategoryOpen(!categoryOpen)}
                 className="group flex items-center gap-1 text-gray-800 hover:text-orange-500"
@@ -358,7 +372,7 @@ export default function AuthNavbar() {
               Sports
             </Link>
             
-            <div className="relative" ref={categoryRef}>
+            <div className="relative" ref={mobileCategoryRef}>
               <button
                 onClick={() => setCategoryOpen(!categoryOpen)}
                 className="group flex items-center gap-1 text-gray-800 hover:text-orange-500"
@@ -383,13 +397,13 @@ export default function AuthNavbar() {
               {categoryOpen && (
                 <div className="absolute z-50 mt-2 w-[165px] bg-white border rounded-xl shadow-lg py-2">
                   <Link
-                    href={`/category/${categoryMap.home}`}
+                    href={`/category/${categoryMap.beauty}`}
                     className="block px-4 py-2 hover:bg-gray-100 text-sm text-gray-700"
                   >
                     Beauty
                   </Link>
                   <Link
-                    href={`/category/${categoryMap.home}`}
+                    href={`/category/${categoryMap.book}`}
                     className="block px-4 py-2 hover:bg-gray-100 text-sm text-gray-700"
                   >
                     Book
