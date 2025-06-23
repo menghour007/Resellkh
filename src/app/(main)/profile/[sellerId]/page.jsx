@@ -1,12 +1,10 @@
-// File: src/app/(main)/profile/[userId]/page.jsx
+// File: src/app/(main)/profile/[sellerId]/page.jsx
 "use client";
 
 import ProfileBanner from "@/components/profile/ProfileBanner";
 import ProfileTabs from "@/components/profile/ProfileTabs";
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { Edit } from "lucide-react";
-import EditProfilePage from "@/components/profile/EditProfilePage";
 // import { useSession } from 'next-auth/react'; // or any auth state
 
 

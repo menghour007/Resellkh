@@ -25,7 +25,7 @@ export default function AuthNavbar() {
   const pathname = usePathname();
   const [categoryOpen, setCategoryOpen] = useState(false);
   const desktopCategoryRef = useRef(null);
-const mobileCategoryRef = useRef(null);
+  const mobileCategoryRef = useRef(null);
 
 
   const categoryMap = {
@@ -40,22 +40,21 @@ const mobileCategoryRef = useRef(null);
     vehicle: 9,
   };
 
-  // useEffect(() => {
-  //   const handleClickOutside = (event) => {
-  //     if (profileRef.current && !profileRef.current.contains(event.target)) {
-  //       setProfileOpen(false);
-  //     }
+  const topCategories = [
+    { name: "Fashion", key: "fashion" },
+    { name: "Accessories", key: "accessories" },
+    { name: "Sports", key: "sport" },
+    { name: "Beauty", key: "beauty", showOn: "lg" }, // show only on large screens
+    { name: "Book", key: "book", showOn: "lg" },
+  ];
 
-  //     if (categoryRef.current && !categoryRef.current.contains(event.target)) {
-  //       setCategoryOpen(false);
-  //     }
-  //   };
+  const dropdownCategories = [
+    { name: "Home", key: "home" },
+    { name: "Sports & Kids", key: "sportskids" },
+    { name: "Electronic", key: "electronic" },
+    { name: "Vehicle", key: "vehicle" },
+  ];
 
-  //   document.addEventListener("mousedown", handleClickOutside);
-  //   return () => {
-  //     document.removeEventListener("mousedown", handleClickOutside);
-  //   };
-  // }, []);
 
   useEffect(() => {
     const checkToken = () => {
@@ -84,28 +83,30 @@ const mobileCategoryRef = useRef(null);
   }, [pathname]);
 
   useEffect(() => {
-  const handleClickOutside = (event) => {
-    // Close profile dropdown
-    if (profileRef.current && !profileRef.current.contains(event.target)) {
-      setProfileOpen(false);
-    }
+    const handleClickOutside = (event) => {
+      // Close profile dropdown
+      if (profileRef.current && !profileRef.current.contains(event.target)) {
+        setProfileOpen(false);
+      }
 
-    // Close category dropdowns (both desktop and mobile)
-    if (
-      desktopCategoryRef.current &&
-      !desktopCategoryRef.current.contains(event.target) &&
-      mobileCategoryRef.current &&
-      !mobileCategoryRef.current.contains(event.target)
-    ) {
-      setCategoryOpen(false);
-    }
-  };
+      // Close category dropdowns (both desktop and mobile)
+      if (
+        desktopCategoryRef.current &&
+        !desktopCategoryRef.current.contains(event.target) &&
+        mobileCategoryRef.current &&
+        !mobileCategoryRef.current.contains(event.target)
+      ) {
+        setCategoryOpen(false);
+      }
+    };
 
-  document.addEventListener("mousedown", handleClickOutside);
-  return () => {
-    document.removeEventListener("mousedown", handleClickOutside);
-  };
-}, []);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+
 
 
   return (
@@ -118,38 +119,30 @@ const mobileCategoryRef = useRef(null);
             onClick={() => router.push("/")}
             className="text-2xl cursor-pointer h-[40px] "
           />
-
           <nav className="hidden md:flex gap-6 text-sm text-gray-800">
-            <Link
-              href={`/category/${categoryMap.fashion}`}
-              className="hover:text-orange-500"
-            >
-              Fashion
-            </Link>
-            <Link
-              href={`/category/${categoryMap.accessories}`}
-              className="hover:text-orange-500"
-            >
-              Accessories
-            </Link>
-            <Link
-              href={`/category/${categoryMap.sport}`}
-              className="hover:text-orange-500"
-            >
-              Sports
-            </Link>
-            <Link
-              href={`/category/${categoryMap.beauty}`}
-              className="hover:text-orange-500 md:hidden lg:block"
-            >
-              Beauty
-            </Link>
-            <Link
-              href={`/category/${categoryMap.book}`}
-              className="hover:text-orange-500 md:hidden lg:block"
-            >
-              Book
-            </Link>
+            {topCategories.map((cat) => {
+              if (cat.showOn === "lg") {
+                return (
+                  <Link
+                    key={cat.key}
+                    href={`/category/${categoryMap[cat.key]}`}
+                    className="hover:text-orange-500 md:hidden lg:block"
+                  >
+                    {cat.name}
+                  </Link>
+                );
+              }
+              return (
+                <Link
+                  key={cat.key}
+                  href={`/category/${categoryMap[cat.key]}`}
+                  className="hover:text-orange-500"
+                >
+                  {cat.name}
+                </Link>
+              );
+            })}
+
             <div className="relative" ref={desktopCategoryRef}>
               <button
                 onClick={() => setCategoryOpen(!categoryOpen)}
@@ -174,32 +167,18 @@ const mobileCategoryRef = useRef(null);
 
               {categoryOpen && (
                 <div className="absolute z-50 mt-2 w-48 bg-white border rounded-xl shadow-lg py-2">
-                  <Link
-                    href={`/category/${categoryMap.home}`}
-                    className="block px-4 py-2 hover:bg-gray-100 text-sm text-gray-700"
-                  >
-                    Home
-                  </Link>
-                  <Link
-                    href={`/category/${categoryMap.sportskids}`}
-                    className="block px-4 py-2 hover:bg-gray-100 text-sm text-gray-700"
-                  >
-                    Sports & Kids
-                  </Link>
-                  <Link
-                    href={`/category/${categoryMap.electronic}`}
-                    className="block px-4 py-2 hover:bg-gray-100 text-sm text-gray-700"
-                  >
-                    Electronic
-                  </Link>
-                  <Link
-                    href={`/category/${categoryMap.vehicle}`}
-                    className="block px-4 py-2 hover:bg-gray-100 text-sm text-gray-700"
-                  >
-                    Vehicle
-                  </Link>
+                  {dropdownCategories.map((cat) => (
+                    <Link
+                      key={cat.key}
+                      href={`/category/${categoryMap[cat.key]}`}
+                      className="block px-4 py-2 hover:bg-gray-100 text-sm text-gray-700"
+                    >
+                      {cat.name}
+                    </Link>
+                  ))}
                 </div>
               )}
+
             </div>
           </nav>
 
@@ -353,92 +332,60 @@ const mobileCategoryRef = useRef(null);
           {/* Mobile & Tablet: stacked layout */}
           <div className="block lg:hidden w-full h-[100px] md:h-[80px] space-y-2">
             <nav className="flex justify-center py-2  md:hidden lg:hidden gap-6 text-sm text-gray-800">
-            <Link
-              href={`/category/${categoryMap.fashion}`}
-              className="hover:text-orange-500"
-            >
-              Fashion
-            </Link>
-            <Link
-              href={`/category/${categoryMap.accessories}`}
-              className="hover:text-orange-500"
-            >
-              Accessories
-            </Link>
-            <Link
-              href={`/category/${categoryMap.sport}`}
-              className="hover:text-orange-500"
-            >
-              Sports
-            </Link>
-            
-            <div className="relative" ref={mobileCategoryRef}>
-              <button
-                onClick={() => setCategoryOpen(!categoryOpen)}
-                className="group flex items-center gap-1 text-gray-800 hover:text-orange-500"
-              >
-                {/* Icon + Label */}
-                <svg
-                  className="w-5 h-5 group-hover:text-orange-500 transition-colors duration-200"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path d="M5.99829 4.75C5.99829 4.33579 6.33408 4 6.74829 4H17.2483C17.6625 4 17.9983 4.33579 17.9983 4.75C17.9983 5.16421 17.6625 5.5 17.2483 5.5H6.74829C6.33408 5.5 5.99829 5.16421 5.99829 4.75ZM5.99829 10C5.99829 9.58579 6.33408 9.25 6.74829 9.25H17.2483C17.6625 9.25 17.9983 9.58579 17.9983 10C17.9983 10.4142 17.6625 10.75 17.2483 10.75H6.74829C6.33408 10.75 5.99829 10.4142 5.99829 10ZM5.99829 15.25C5.99829 14.8358 6.33408 14.5 6.74829 14.5H17.2483C17.6625 14.5 17.9983 14.8358 17.9983 15.25C17.9983 15.6642 17.6625 16 17.2483 16H6.74829C6.33408 16 5.99829 15.6642 5.99829 15.25Z" />
-                  <path d="M1.98828 4.75C1.98828 4.19772 2.436 3.75 2.98828 3.75H2.99828C3.55057 3.75 3.99828 4.19772 3.99828 4.75V4.76C3.99828 5.31228 3.55057 5.76 2.99828 5.76H2.98828C2.436 5.76 1.98828 5.31228 1.98828 4.76V4.75Z" />
-                  <path d="M1.98828 15.25C1.98828 14.6977 2.436 14.25 2.98828 14.25H2.99828C3.55057 14.25 3.99828 14.6977 3.99828 15.25V15.26C3.99828 15.8123 3.55057 16.26 2.99828 16.26H2.98828C2.436 16.26 1.98828 15.8123 1.98828 15.26V15.25Z" />
-                  <path d="M1.98828 10C1.98828 9.44772 2.436 9 2.98828 9H2.99828C3.55057 9 3.99828 9.44772 3.99828 10V10.01C3.99828 10.5623 3.55057 11.01 2.99828 11.01H2.98828C2.436 11.01 1.98828 10.5623 1.98828 10.01V10Z" />
-                </svg>
-                <span className="group-hover:text-orange-500 transition-colors duration-200">
-                  All Categories
-                </span>
-              </button>
+              {topCategories
+                .filter((cat) => !cat.showOn || cat.showOn !== "lg")
+                .map((cat) => (
+                  <Link
+                    key={cat.key}
+                    href={`/category/${categoryMap[cat.key]}`}
+                    className="hover:text-orange-500"
+                  >
+                    {cat.name}
+                  </Link>
+                ))}
 
-              {categoryOpen && (
-                <div className="absolute z-50 mt-2 w-[165px] bg-white border rounded-xl shadow-lg py-2">
-                  <Link
-                    href={`/category/${categoryMap.beauty}`}
-                    className="block px-4 py-2 hover:bg-gray-100 text-sm text-gray-700"
+
+              <div className="relative" ref={mobileCategoryRef}>
+                <button
+                  onClick={() => setCategoryOpen(!categoryOpen)}
+                  className="group flex items-center gap-1 text-gray-800 hover:text-orange-500"
+                >
+                  {/* Icon + Label */}
+                  <svg
+                    className="w-5 h-5 group-hover:text-orange-500 transition-colors duration-200"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg"
                   >
-                    Beauty
-                  </Link>
-                  <Link
-                    href={`/category/${categoryMap.book}`}
-                    className="block px-4 py-2 hover:bg-gray-100 text-sm text-gray-700"
-                  >
-                    Book
-                  </Link>
-                  <Link
-                    href={`/category/${categoryMap.home}`}
-                    className="block px-4 py-2 hover:bg-gray-100 text-sm text-gray-700"
-                  >
-                    Home
-                  </Link>
-                  <Link
-                    href={`/category/${categoryMap.sportskids}`}
-                    className="block px-4 py-2 hover:bg-gray-100 text-sm text-gray-700"
-                  >
-                    Sports & Kids
-                  </Link>
-                  <Link
-                    href={`/category/${categoryMap.electronic}`}
-                    className="block px-4 py-2 hover:bg-gray-100 text-sm text-gray-700"
-                  >
-                    Electronic
-                  </Link>
-                  <Link
-                    href={`/category/${categoryMap.vehicle}`}
-                    className="block px-4 py-2 hover:bg-gray-100 text-sm text-gray-700"
-                  >
-                    Vehicle
-                  </Link>
-                </div>
-              )}
-            </div>
-          </nav>
+                    <path d="M5.99829 4.75C5.99829 4.33579 6.33408 4 6.74829 4H17.2483C17.6625 4 17.9983 4.33579 17.9983 4.75C17.9983 5.16421 17.6625 5.5 17.2483 5.5H6.74829C6.33408 5.5 5.99829 5.16421 5.99829 4.75ZM5.99829 10C5.99829 9.58579 6.33408 9.25 6.74829 9.25H17.2483C17.6625 9.25 17.9983 9.58579 17.9983 10C17.9983 10.4142 17.6625 10.75 17.2483 10.75H6.74829C6.33408 10.75 5.99829 10.4142 5.99829 10ZM5.99829 15.25C5.99829 14.8358 6.33408 14.5 6.74829 14.5H17.2483C17.6625 14.5 17.9983 14.8358 17.9983 15.25C17.9983 15.6642 17.6625 16 17.2483 16H6.74829C6.33408 16 5.99829 15.6642 5.99829 15.25Z" />
+                    <path d="M1.98828 4.75C1.98828 4.19772 2.436 3.75 2.98828 3.75H2.99828C3.55057 3.75 3.99828 4.19772 3.99828 4.75V4.76C3.99828 5.31228 3.55057 5.76 2.99828 5.76H2.98828C2.436 5.76 1.98828 5.31228 1.98828 4.76V4.75Z" />
+                    <path d="M1.98828 15.25C1.98828 14.6977 2.436 14.25 2.98828 14.25H2.99828C3.55057 14.25 3.99828 14.6977 3.99828 15.25V15.26C3.99828 15.8123 3.55057 16.26 2.99828 16.26H2.98828C2.436 16.26 1.98828 15.8123 1.98828 15.26V15.25Z" />
+                    <path d="M1.98828 10C1.98828 9.44772 2.436 9 2.98828 9H2.99828C3.55057 9 3.99828 9.44772 3.99828 10V10.01C3.99828 10.5623 3.55057 11.01 2.99828 11.01H2.98828C2.436 11.01 1.98828 10.5623 1.98828 10.01V10Z" />
+                  </svg>
+                  <span className="group-hover:text-orange-500 transition-colors duration-200">
+                    All Categories
+                  </span>
+                </button>
+
+                {categoryOpen && (
+                  <div className="absolute z-50 mt-2 w-48 bg-white border rounded-xl shadow-lg py-2">
+                    {dropdownCategories.map((cat) => (
+                      <Link
+                        key={cat.key}
+                        href={`/category/${categoryMap[cat.key]}`}
+                        className="block px-4 py-2 hover:bg-gray-100 text-sm text-gray-700"
+                      >
+                        {cat.name}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+
+              </div>
+            </nav>
             <LocationDropdown />
             <SearchBar />
-            
+
           </div>
 
           {/* Desktop: side by side */}
@@ -455,16 +402,6 @@ const mobileCategoryRef = useRef(null);
       </div>
 
       <ImageScanModal open={scanOpen} onClose={() => setScanOpen(false)} />
-      {/* <ConfirmLogout
-        isOpen={showLogoutModal}
-        onClose={() => setShowLogoutModal(false)}
-        onConfirm={() => {
-          localStorage.removeItem("authToken");
-          setShowLogoutModal(false);
-          router.push("/login");
-        }}
-        title="Are you sure that you want to log out?"
-      /> */}
       <ConfirmLogout
         isOpen={showLogoutModal}
         onClose={() => setShowLogoutModal(false)}
