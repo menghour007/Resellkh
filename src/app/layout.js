@@ -29,33 +29,36 @@
   
 // }
 
-
-import { Book } from 'lucide-react';
+'use client';
 import './globals.css';
 import { Poppins } from "next/font/google";
 import { BookmarkProvider } from '@/context/BookmarkContext';
 import { Toaster } from "react-hot-toast";
+import { SessionProvider } from "next-auth/react";
+import TokenStorage from '@/components/TokenStorage';
 
+
+// Load Google Fonts
 const poppins = Poppins({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
   variable: "--font-poppins",
 });
-export const metadata = {
-  title: 'ResellKH',
-  description: 'Cambodia’s resale platform',
-};
+
+
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="font-sans">
-        <BookmarkProvider >
-          <Toaster position="right-bottom" reverseOrder={false} />
-        {children}
-        </BookmarkProvider>
+      <body className={`${poppins.variable} font-sans`}>
+        <SessionProvider>
+          <BookmarkProvider>
+            <Toaster position="right-bottom" reverseOrder={false} />
+            <TokenStorage />
+            {children}
+          </BookmarkProvider>
+        </SessionProvider>
       </body>
     </html>
   );
 }
-

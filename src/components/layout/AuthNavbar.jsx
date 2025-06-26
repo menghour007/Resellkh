@@ -1,20 +1,16 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { BiCategoryAlt } from "react-icons/bi";
+import { useState, useEffect, useRef } from "react";
+import { useRouter, usePathname } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
+
 import SearchBar from "./navbar/SearchBar";
 import LocationDropdown from "./navbar/LocationDropdown";
 import ImageScanModal from "./navbar/ImageScanModal";
-import Link from "next/link";
 import ConfirmLogout from "./navbar/Confirmlogout";
-import { useRef, useEffect } from "react";
-import { usePathname } from "next/navigation";
+import { signOut } from "next-auth/react";
 
-// {
-//   user = { name: "Bou Leakhena", avatar: "/girl 2.jpg" },
-// }
 export default function AuthNavbar() {
   const [user, setUser] = useState(null);
   const [scanOpen, setScanOpen] = useState(false);
@@ -38,61 +34,82 @@ export default function AuthNavbar() {
     vehicle: 9,
   };
 
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (profileRef.current && !profileRef.current.contains(event.target)) {
         setProfileOpen(false);
       }
-
       if (categoryRef.current && !categoryRef.current.contains(event.target)) {
         setCategoryOpen(false);
       }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
 
   useEffect(() => {
-    const checkToken = () => {
-      const token = localStorage.getItem("authToken");
-      if (token) {
-        const mockUser = {
+  const checkLogin = async () => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) {
+        try {
+          const parsedUser = JSON.parse(storedUser);
+          if (!parsedUser?.id) {
+            setUser(null);
+            return;
+          }
+          const res = await fetch(`https://exchange-solely-finest-makers.trycloudflare.com//api/v1/profile/${parsedUser.id}`);
+          if (!res.ok) {
+            console.error("Failed to fetch user profile");
+            setUser(null);
+            return;
+          }
+          const result = await res.json();
+          if (result.payload) {
+            setUser({
+              id: result.payload.userId || parsedUser.id,
+              name: parsedUser.name || "User",
+              avatar: result.payload.profileImage || "/default-avatar.jpg",
+            });
+          } else {
+            setUser(null);
+          }
+        } catch (err) {
+          console.error("Error parsing user or fetching profile:", err);
+          setUser(null);
+        }
+      } else {
+        setUser({
           name: "Bou Leakhena",
           avatar: "/girl 2.jpg",
-        };
-        setUser(mockUser);
-      } else {
-        setUser(null);
+        });
       }
-    };
+    } else {
+      setUser(null);
+    }
+  };
 
-    checkToken();
-    window.addEventListener("storage", checkToken);
+  checkLogin();
+  window.addEventListener("storage", checkLogin);
+  return () => window.removeEventListener("storage", checkLogin);
+}, []);
 
-    return () => window.removeEventListener("storage", checkToken);
-  }, []);
-
-  // Close profile dropdown and logout modal on route change
+  // Close profile dropdown & logout modal on route change
   useEffect(() => {
     setProfileOpen(false);
     setShowLogoutModal(false);
   }, [pathname]);
 
-  // Close dropdown on click outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (profileRef.current && !profileRef.current.contains(event.target)) {
-        setProfileOpen(false);
-      }
-    };
-
-    if (profileOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-  }, []);
+  const handlelogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    localStorage.removeItem("userRole");
+    signOut({ callbackUrl: "/" });
+  };
 
   return (
     <div className="w-full sticky top-0 z-[200] bg-white px-[7%] py-4">
@@ -102,8 +119,9 @@ export default function AuthNavbar() {
             src="/images/auth/logo.jpg"
             alt="ResellKH Logo"
             onClick={() => router.push("/")}
-            className="text-2xl cursor-pointer h-[40px] "
+            className="text-2xl cursor-pointer h-[40px]"
           />
+
           <nav className="hidden md:flex gap-6 text-sm text-gray-800">
             <Link
               href={`/category/${categoryMap.fashion}`}
@@ -192,16 +210,10 @@ export default function AuthNavbar() {
           <div className="flex items-center gap-4 text-gray-700 text-sm">
             {!user ? (
               <>
-                <Link
-                  href="/register"
-                  className="hover:text-orange-500 font-medium"
-                >
+                <Link href="/register" className="hover:text-orange-500 font-medium">
                   Register
                 </Link>
-                <Link
-                  href="/login"
-                  className="hover:text-orange-500 font-medium"
-                >
+                <Link href="/login" className="hover:text-orange-500 font-medium">
                   Log in
                 </Link>
                 <button
@@ -213,11 +225,10 @@ export default function AuthNavbar() {
               </>
             ) : (
               <>
-                <Link
-                  href="/favourites"
-                  className="cursor-pointer hover:text-orange-500"
-                >
-                  {/* Favourites Icon */}
+                {/* Favourites icon */}
+                <Link href="/favourites" className="cursor-pointer hover:text-orange-500">
+                  {/* SVG icon as you had */}
+                  {/* ... same svg code here ... */}
                   <svg
                     width="20"
                     height="20"
@@ -232,14 +243,11 @@ export default function AuthNavbar() {
                   </svg>
                 </Link>
 
-                <Link
-                  href="/notifications"
-                  className="cursor-pointer hover:text-orange-500"
-                >
+                {/* Notification icon */}
+                <Link href="/notifications" className="cursor-pointer hover:text-orange-500">
                   <div className="relative">
-                    {/* Notification Icon */}
                     <svg
-                      className="w-6 h-6 stroke-[1.5] stroke-gray-900" // control stroke width and color here
+                      className="w-6 h-6 stroke-[1.5] stroke-gray-900"
                       viewBox="0 0 30 30"
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"
@@ -263,7 +271,7 @@ export default function AuthNavbar() {
 
                 {/* Avatar Dropdown */}
                 <div className="relative" ref={profileRef}>
-                  <Image
+                  <img
                     src={user.avatar}
                     alt="User Avatar"
                     width={32}
@@ -275,7 +283,7 @@ export default function AuthNavbar() {
                     <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-xl shadow-lg z-30">
                       <Link href="/profile/sellerId" className="cursor-pointer">
                         <div className="flex items-center gap-3 px-4 py-3 border-b">
-                          <Image
+                          <img
                             src={user.avatar}
                             alt="User Avatar"
                             width={40}
@@ -295,7 +303,7 @@ export default function AuthNavbar() {
                       <button
                         onClick={() => {
                           setProfileOpen(false);
-                          setShowLogoutModal(true);
+                          handlelogout();
                         }}
                         className="w-full px-4 py-3 rounded-b-xl flex items-center gap-2 text-sm text-gray-700 hover:bg-gray-100"
                       >

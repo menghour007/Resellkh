@@ -5,6 +5,8 @@ import Input from "@/components/ui/Input";
 import InputFillPassword from "@/components/ui/InputFillPassword";
 import { HiOutlineEye, HiOutlineEyeOff } from "react-icons/hi";
 import { useRouter } from "next/navigation";
+import { useGoogleLogin } from "@react-oauth/google";
+import { signIn } from "next-auth/react";
 
 export default function Register() {
   const router = useRouter();
@@ -17,27 +19,13 @@ export default function Register() {
     confirmPassword: "",
   });
 
-  const [touched, setTouched] = useState({
-    firstName: false,
-    lastName: false,
-    email: false,
-    password: false,
-    confirmPassword: false,
-  });
-
+  const [touched, setTouched] = useState({});
   const [errors, setErrors] = useState({});
+  const [submitError, setSubmitError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
-   const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  //  const handleLogin = (e) => {
-  //   e.preventDefault();
-  //   setLoading(true);
-
-  //   setTimeout(() => {
-  //     router.push('/');
-  //   }, 1000);
-  // };
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
     setErrors((prev) => ({ ...prev, [e.target.name]: "" }));
@@ -61,7 +49,7 @@ export default function Register() {
     return newErrors;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const newErrors = validateForm();
     setErrors(newErrors);
@@ -74,21 +62,59 @@ export default function Register() {
     });
 
     if (Object.keys(newErrors).length === 0) {
-      // Simulate token storage
-      localStorage.setItem("authToken", "mocked-token");
-      window.dispatchEvent(new Event("storage"));
-      router.push("/verifyOTP");
+      setLoading(true);
+      setSubmitError("");
+      try {
+        const response = await fetch('https://exchange-solely-finest-makers.trycloudflare.com/api/v1/auths/register', {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(form),
+        });
+
+        let result = {};
+        try {
+          result = await response.json();
+          console.log("Response JSON:", result);
+        } catch {
+          console.error("Failed to parse response as JSON");
+          result = { message: "Failed to parse server response" };  
+        }
+
+        if (response.ok) {
+          localStorage.setItem("authToken", "mocked-token");
+          window.dispatchEvent(new Event("storage"));
+          router.push(`/verifyOTP?email=${form.email}`);
+
+        } else if (response.status === 401) {
+          setSubmitError("Unauthorized: Make sure the /register endpoint is public.");
+        } else {
+          setSubmitError(result?.message || "Registration failed. Please try again.");
+        }
+      } catch (err) {
+        console.error("Registration error:", err);
+        setSubmitError("Registration failed. Please try again.");
+      } finally {
+        setLoading(false);
+      }
     }
   };
+
+ 
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row items-center justify-around bg-white px-4 sm:px-6 md:px-12 lg:px-24 xl:px-32">
       <div className="w-full lg:w-1/2 max-w-md py-8 space-y-4">
         <div className="flex justify-center mb-2">
-           <img src="/images/auth/logo.jpg" alt="logo" className='w-[130px]' />
+          <img src="/images/auth/logo.jpg" alt="logo" className="w-[130px]" />
         </div>
 
-        <form onSubmit={handleSubmit}  className="flex flex-col gap-4">
+        {submitError && (
+          <p className="text-red-500 text-sm text-center mb-2">{submitError}</p>
+        )}
+
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div className="flex flex-col md:flex-row gap-6">
             <div className="w-full h-[77px] md:w-1/2">
               <Input
@@ -166,20 +192,12 @@ export default function Register() {
             )}
           </div>
 
-          {/* <button
-            type="submit"
-            disabled={loading}
-            className={`w-full bg-orange-500 hover:bg-orange-600 text-white rounded-full py-3 font-semibold transition ${loading ? 'opacity-60 cursor-not-allowed' : ''
-              }`}
-          >
-            {loading ? 'Continoue...' : 'Register'}
-          </button> */}
           <button
             type="submit"
-             disabled={loading}
+            disabled={loading}
             className="w-full p-3 bg-orange-500 text-white rounded-full font-semibold hover:bg-orange-600 transition"
           >
-            Register
+            {loading ? "Registering..." : "Register"}
           </button>
         </form>
 
@@ -188,14 +206,16 @@ export default function Register() {
           <span className="text-gray-400 text-sm">Or</span>
           <hr className="w-1/4 border-gray-300" />
         </div>
-
-        <button className="w-full flex items-center justify-center gap-3 border border-gray-900 p-3 rounded-full hover:bg-gray-50 transition">
-          <img src="/google-20.png" alt="Google" className="w-5 h-5" />
-          <span className="text-sm font-medium text-gray-700">
-            Continue with Google
-          </span>
-        </button>
-
+      <button
+        type="button"
+        onClick={() => signIn("google", { callbackUrl: "/" })}
+        className="w-full flex items-center justify-center gap-3 border border-gray-900 p-3 rounded-full hover:bg-gray-50 transition"
+      >
+        <img src="/google-20.png" alt="Google" className="w-5 h-5" />
+        <span className="text-sm font-medium text-gray-700">
+          Continue with Google
+        </span>
+    </button>
         <p className="mt-4 text-center text-sm">
           Already have an account?{" "}
           <a href="/login" className="text-orange-600 font-semibold">
@@ -206,7 +226,7 @@ export default function Register() {
 
       <div className="hidden lg:flex md:ps-10 justify-center mt-14 lg:mt-0">
         <img
-          src="/images/auth/register.jpg"
+          src="/images/auth/register.jpg" 
           alt="Register Illustration"
           width={450}
           height={450}
