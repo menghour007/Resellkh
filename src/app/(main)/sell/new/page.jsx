@@ -7,10 +7,10 @@ import ConditionSelector from '@/components/sell/ConditionSelector';
 import ItemDetailForm from '@/components/sell/ItemDetailForm';
 import DealMethod from '@/components/sell/DealMethod';
 import PricingInput from '@/components/sell/PricingInput';
-import Footer from '@/components/layout/Footer';
+// import Footer from '@/components/layout/Footer';
 import { useEffect} from 'react';
 import { useRouter } from 'next/navigation';
-
+import { createProduct } from '@/components/services/sell.service';
 
 export default function SellNewPage() {
   const router = useRouter();
@@ -24,7 +24,28 @@ export default function SellNewPage() {
   const [price, setPrice] = useState('');
   const [discount, setDiscount] = useState('');
   
+ const handleSubmit = async () => {
+  const formData = new FormData();
+  files.forEach(file => {
+    formData.append('images', file);
+  });
+  
+  formData.append('title', title);
+  formData.append('category', category);
+  formData.append('price', price);
+  formData.append('discount', discount);
+  formData.append('description', description);
+  formData.append('condition', condition);
+  formData.append('location', location);
+  formData.append('telegram', telegram);
 
+  const result = await createProduct(formData);
+  if (result.success !== false) {
+    router.push('/profile/seller');
+  } else {
+    alert("Error: " + result.error);
+  }
+};
 
   useEffect(() => {
     const stored = localStorage.getItem('uploadedPreviews');
@@ -87,8 +108,11 @@ export default function SellNewPage() {
         </div>
 
         {/* Bottom Button */}
-        <div className="text-end mt-8" onClick={() => router.push('/profile/seller')}>
-          <button className="px-6 py-2 mt-2 bg-orange-500 text-white rounded-full hover:bg-orange-600 transition">
+        <div className="text-end mt-8">
+          <button
+            className="px-6 py-2 mt-2 bg-orange-500 text-white rounded-full hover:bg-orange-600 transition"
+            onClick={handleSubmit}
+            >
             List now
           </button>
         </div>

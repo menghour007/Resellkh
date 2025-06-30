@@ -136,6 +136,7 @@ export default function OTPVerification() {
               maxLength="1"
               value={digit}
               onChange={(e) => handleChange(e.target.value, idx)}
+              onKeyDown={(e) => handleKeyDown(e, idx)}
               className="w-12 h-12 border-b-2 text-center text-xl outline-none focus:border-orange-500 transition"
             />
           ))}
