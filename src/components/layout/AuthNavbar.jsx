@@ -1,20 +1,14 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { BiCategoryAlt } from "react-icons/bi";
-import Image from "next/image";
-import SearchBar from "./navbar/SearchBar";
+import { useState, useEffect, useRef } from "react";
 import LocationDropdown from "./navbar/LocationDropdown";
-import ImageScanModal from "./navbar/ImageScanModal";
+import SearchBar from "./navbar/SearchBar";
+import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
+import ImageScanModal from "./navbar/ImageScanModal";
 import ConfirmLogout from "./navbar/Confirmlogout";
-import { useRef, useEffect } from "react";
-import { usePathname } from "next/navigation";
+import { signOut } from "next-auth/react";
 
-// {
-//   user = { name: "Bou Leakhena", avatar: "/girl 2.jpg" },
-// }
 export default function AuthNavbar() {
   const [user, setUser] = useState(null);
   const [scanOpen, setScanOpen] = useState(false);
@@ -40,74 +34,85 @@ export default function AuthNavbar() {
     vehicle: 9,
   };
 
-  const topCategories = [
-    { name: "Fashion", key: "fashion" },
-    { name: "Accessories", key: "accessories" },
-    { name: "Sports", key: "sport" },
-    { name: "Beauty", key: "beauty", showOn: "lg" }, // show only on large screens
-    { name: "Book", key: "book", showOn: "lg" },
-  ];
-
-  const dropdownCategories = [
-    { name: "Home", key: "home" },
-    { name: "Sports & Kids", key: "sportskids" },
-    { name: "Electronic", key: "electronic" },
-    { name: "Vehicle", key: "vehicle" },
-  ];
-
-
+  // Close profile dropdown on outside click
   useEffect(() => {
-    const checkToken = () => {
-      const token = localStorage.getItem("authToken");
-      if (token) {
-        const mockUser = {
-          name: "Bou Leakhena",
-          avatar: "/girl 2.jpg",
-        };
-        setUser(mockUser);
-      } else {
+    const handleClickOutside = (event) => {
+      if (profileRef.current && !profileRef.current.contains(event.target)) {
+        setProfileOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Fetch user profile from localStorage and backend
+  useEffect(() => {
+    const updateUserFromStorage = async () => {
+      const token = localStorage.getItem("token");
+      const userId = localStorage.getItem("userId");
+      const firstName = localStorage.getItem("firstName");
+      const lastName = localStorage.getItem("lastName");
+      const profileImage = localStorage.getItem("profileImage");
+
+      if (!token || !userId) {
+        setUser(null);
+        return;
+      }
+
+      try {
+        const res = await fetch(
+          `https://phil-whom-hide-lynn.trycloudflare.com/api/v1/profile/${userId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (!res.ok) {
+          console.error("Failed to fetch user profile");
+          setUser(null);
+          return;
+        }
+
+        const json = await res.json();
+
+        setUser({
+          id: userId,
+          name: `${firstName || ""} ${lastName || ""}`.trim() || "User",
+          avatar: json.payload?.profileImage || profileImage || "https://media.istockphoto.com/id/1495088043/vector/user-profile-icon-avatar-or-person-icon-profile-picture-portrait-symbol-default-portrait.jpg?s=612x612&w=0&k=20&c=dhV2p1JwmloBTOaGAtaA3AW1KSnjsdMt7-U_3EZElZ0=",
+        });
+      } catch (err) {
+        console.error("Error fetching user profile:", err);
         setUser(null);
       }
     };
 
-    checkToken();
-    window.addEventListener("storage", checkToken);
+    updateUserFromStorage();
 
-    return () => window.removeEventListener("storage", checkToken);
+    // Optional: listen for auth-change event to update user on login/logout
+    window.addEventListener("auth-change", updateUserFromStorage);
+    return () => window.removeEventListener("auth-change", updateUserFromStorage);
   }, []);
 
-  // Close profile dropdown and logout modal on route change
+  // Close profile dropdown on route change
   useEffect(() => {
     setProfileOpen(false);
-    setShowLogoutModal(false);
   }, [pathname]);
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      // Close profile dropdown
-      if (profileRef.current && !profileRef.current.contains(event.target)) {
-        setProfileOpen(false);
-      }
-
-      // Close category dropdowns (both desktop and mobile)
-      if (
-        desktopCategoryRef.current &&
-        !desktopCategoryRef.current.contains(event.target) &&
-        mobileCategoryRef.current &&
-        !mobileCategoryRef.current.contains(event.target)
-      ) {
-        setCategoryOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
-
-
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("userId");
+    localStorage.removeItem("email");
+    localStorage.removeItem("role");
+    localStorage.removeItem("firstName");
+    localStorage.removeItem("lastName");
+    localStorage.removeItem("profileImage");
+    setShowLogoutModal(false);
+    setUser(null);
+    signOut({ callbackUrl: "/" });
+  };
 
   return (
     <div className="w-full sticky top-0 z-[200] bg-white px-[7%] py-4">
@@ -117,8 +122,9 @@ export default function AuthNavbar() {
             src="/images/auth/logo.jpg"
             alt="ResellKH Logo"
             onClick={() => router.push("/")}
-            className="text-2xl cursor-pointer h-[40px] "
+            className="text-2xl cursor-pointer h-[40px]"
           />
+
           <nav className="hidden md:flex gap-6 text-sm text-gray-800">
             {topCategories.map((cat) => {
               if (cat.showOn === "lg") {
@@ -186,16 +192,10 @@ export default function AuthNavbar() {
           <div className="flex items-center gap-4 text-gray-700 text-sm">
             {!user ? (
               <>
-                <Link
-                  href="/register"
-                  className="hover:text-orange-500 font-medium"
-                >
+                <Link href="/register" className="hover:text-orange-500 font-medium">
                   Register
                 </Link>
-                <Link
-                  href="/login"
-                  className="hover:text-orange-500 font-medium"
-                >
+                <Link href="/login" className="hover:text-orange-500 font-medium">
                   Log in
                 </Link>
                 <button
@@ -207,11 +207,10 @@ export default function AuthNavbar() {
               </>
             ) : (
               <>
-                <Link
-                  href="/favourites"
-                  className="cursor-pointer hover:text-orange-500"
-                >
-                  {/* Favourites Icon */}
+                {/* Favourites icon */}
+                <Link href="/favourites" className="cursor-pointer hover:text-orange-500">
+                  {/* SVG icon as you had */}
+                  {/* ... same svg code here ... */}
                   <svg
                     width="20"
                     height="20"
@@ -226,14 +225,11 @@ export default function AuthNavbar() {
                   </svg>
                 </Link>
 
-                <Link
-                  href="/notifications"
-                  className="cursor-pointer hover:text-orange-500"
-                >
+                {/* Notification icon */}
+                <Link href="/notifications" className="cursor-pointer hover:text-orange-500">
                   <div className="relative">
-                    {/* Notification Icon */}
                     <svg
-                      className="w-6 h-6 stroke-[1.5] stroke-gray-900" // control stroke width and color here
+                      className="w-6 h-6 stroke-[1.5] stroke-gray-900"
                       viewBox="0 0 30 30"
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"
@@ -257,7 +253,7 @@ export default function AuthNavbar() {
 
                 {/* Avatar Dropdown */}
                 <div className="relative" ref={profileRef}>
-                  <Image
+                  <img
                     src={user.avatar}
                     alt="User Avatar"
                     width={32}
@@ -269,11 +265,11 @@ export default function AuthNavbar() {
                     <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-xl shadow-lg z-30">
                       <Link href="/profile/sellerId" className="cursor-pointer">
                         <div className="flex items-center gap-3 px-4 py-3 border-b">
-                          <Image
+                          <img
                             src={user.avatar}
                             alt="User Avatar"
-                            width={40}
-                            height={40}
+                            width={50}
+                            height={50}
                             className="rounded-full object-cover"
                           />
                           <div>
@@ -289,7 +285,7 @@ export default function AuthNavbar() {
                       <button
                         onClick={() => {
                           setProfileOpen(false);
-                          setShowLogoutModal(true);
+                          handleLogout();
                         }}
                         className="w-full px-4 py-3 rounded-b-xl flex items-center gap-2 text-sm text-gray-700 hover:bg-gray-100"
                       >
