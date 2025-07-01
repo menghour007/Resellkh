@@ -7,7 +7,6 @@ import ConditionSelector from '@/components/sell/ConditionSelector';
 import ItemDetailForm from '@/components/sell/ItemDetailForm';
 import DealMethod from '@/components/sell/DealMethod';
 import PricingInput from '@/components/sell/PricingInput';
-import Footer from '@/components/layout/Footer';
 import { useEffect} from 'react';
 import { useRouter } from 'next/navigation';
 
@@ -23,7 +22,9 @@ export default function SellNewPage() {
   const [telegram, setTelegram] = useState('');
   const [price, setPrice] = useState('');
   const [discount, setDiscount] = useState('');
-  
+  const [latLng, setLatLng] = useState({ lat: null, lng: null });
+  const [latitude, setLatitude] = useState(null);
+  const [longitude, setLongitude] = useState(null);
 
 
   useEffect(() => {
@@ -74,6 +75,9 @@ export default function SellNewPage() {
                   setLocation={setLocation}
                   telegram={telegram}
                   setTelegram={setTelegram}
+                  setLatLng={setLatLng}
+                  setLatitude={setLatitude}
+                  setLongitude={setLongitude}
                 />
                 <PricingInput
                   price={price}
