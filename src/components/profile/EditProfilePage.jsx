@@ -3,8 +3,8 @@
 import Image from "next/image";
 import CustomDropdown from "./someComponent/CustomDropdown";
 import Link from "next/link";
-import { useRef, useState } from 'react';
-import { Move } from 'lucide-react';
+import { useRef, useState, useEffect } from "react";
+import { Move } from "lucide-react";
 
 const provinceOptions = [
   "Phnom Penh",
@@ -31,57 +31,253 @@ const provinceOptions = [
   "Svay Rieng",
   "Takeo",
   "Tbong Khmum",
-  "Bavet"
+  "Bavet",
 ];
+
+// Fixed Service function
+export const UpdateUserProfile = async (formData, token) => {
+  const res = await fetch(
+    "https://phil-whom-hide-lynn.trycloudflare.com/api/v1/profile/edit",
+    {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        // Don't set Content-Type for FormData - browser will set it automatically
+      },
+      body: formData, // Send FormData directly
+    }
+  );
+  const data = await res.json();
+  return data;
+};
 
 export default function EditProfilePage() {
   const [formData, setFormData] = useState({
-    username: "leakhena92_q",
-    firstName: "Bou",
-    lastName: "Leakhena",
-    bio: "Working towards a sustainable future by giving my treasured items a better home! No refunds!",
-    location: "Phnom Penh",
+    username: "",
+    firstName: "",
+    lastName: "",
+    profileImage: null, // Will store File object
+    coverImage: null, // Will store File object
+    bio: "",
+    location: "",
     address: "",
     telegram: "",
-    mobile: "097 47 99 099",
+    mobile: "",
     gender: "",
     birthday: "",
   });
 
+  // For display purposes
+  const [selectedImage, setSelectedImage] = useState("/girl 2.jpg");
+  const [selectedCoverImage, setSelectedCoverImage] = useState("/cover.jpg");
+
+  function parseJwt(token) {
+    try {
+      return JSON.parse(atob(token.split(".")[1]));
+    } catch (e) {
+      console.error("Failed to parse JWT:", e);
+      return null;
+    }
+  }
+
+  // File input refs for both profile and cover images
+  const profileFileInputRef = useRef(null);
+  const coverFileInputRef = useRef(null);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const token = localStorage.getItem("token");
+      if (token) {
+        const decodedToken = parseJwt(token);
+        const userId = decodedToken?.userId;
+
+        if (userId) {
+          try {
+            const res = await fetch(
+              `https://phil-whom-hide-lynn.trycloudflare.com/api/v1/profile/${userId}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              }
+            );
+
+            if (!res.ok) throw new Error("Failed to fetch user profile");
+            const data = await res.json();
+            console.log("User profile API response:", data);
+
+            if (data.payload) {
+              setFormData({
+                username: data.payload.userName || "",
+                firstName: data.payload.firstName || "",
+                lastName: data.payload.lastName || "",
+                profileImage: null, // Reset file objects
+                coverImage: null, // Reset file objects
+                bio: data.payload.slogan || "",
+                location: data.payload.address || "",
+                address: data.payload.addressMap || "",
+                telegram: data.payload.telegramUrl || "",
+                mobile: data.payload.phoneNumber || "",
+                gender: data.payload.gender || "",
+                birthday: data.payload.birthday || "",
+              });
+              setSelectedImage(data.payload.profileImage || "/girl 2.jpg");
+              setSelectedCoverImage(data.payload.coverImage || "/cover.jpg");
+            }
+          } catch (err) {
+            console.error("Error fetching user:", err);
+          }
+        }
+      }
+    };
+
+    fetchProfile();
+    window.addEventListener("storage", fetchProfile);
+    return () => window.removeEventListener("storage", fetchProfile);
+  }, []);
+
   const handleChange = (field) => (e) =>
     setFormData((prev) => ({ ...prev, [field]: e.target.value }));
 
-  const handleSave = () => {
-    console.log("Saved:", formData);
-    alert("Changes saved");
+  // Helper function to format date for backend
+  const formatDateForBackend = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US"); // MM/dd/yyyy format
   };
 
-  const fileInputRef = useRef(null);
-  const [selectedImage, setSelectedImage] = useState('/girl 2.jpg');
+  const handleSave = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("Please log in first");
+        return;
+      }
 
-  const handleFileChange = (e) => {
+      // Get userId from token
+      const decodedToken = parseJwt(token);
+      const userId = decodedToken?.userId;
+
+      if (!userId) {
+        alert("Invalid user session");
+        return;
+      }
+
+      const form = new FormData();
+
+      // Add required fields
+      form.append("userId", userId);
+      form.append("gender", formData.gender || "");
+      // form.append("birthday", formatDateForBackend(formData.birthday));
+      form.append("birthday", formData.birthday); // keep it in yyyy-MM-dd
+
+      // Add optional fields only if they have values
+      if (formData.firstName) form.append("firstName", formData.firstName);
+      if (formData.lastName) form.append("lastName", formData.lastName);
+      if (formData.username) form.append("userName", formData.username);
+      if (formData.bio) form.append("slogan", formData.bio);
+      if (formData.location) form.append("address", formData.location);
+      if (formData.address) form.append("addressMap", formData.address);
+      if (formData.telegram) form.append("telegramUrl", formData.telegram);
+      if (formData.mobile) form.append("phoneNumber", formData.mobile);
+
+      // Add image files if they were selected (File objects, not URLs)
+      if (formData.profileImage instanceof File) {
+        form.append("profileImage", formData.profileImage);
+      }
+      if (formData.coverImage instanceof File) {
+        form.append("coverImage", formData.coverImage);
+      }
+
+      console.log("FormData entries:");
+      for (let [key, value] of form.entries()) {
+        console.log(key, value);
+      }
+
+      const response = await UpdateUserProfile(form, token);
+
+      console.log("Backend response:", response);
+
+      // Check if response indicates success
+      if (response && (response.status === 200 || response.code === 200)) {
+        alert("Profile updated successfully!");
+      } else {
+        throw new Error(response?.message || "Update failed");
+      }
+    } catch (err) {
+      console.error("Update error:", err);
+      alert("Failed to update profile: " + err.message);
+    }
+  };
+
+  // Fixed Profile image upload handler
+  const handleProfileFileChange = (e) => {
     const file = e.target.files?.[0];
     if (file) {
       const imageURL = URL.createObjectURL(file);
       setSelectedImage(imageURL);
 
-      // TODO: Upload this file to backend
-      // const formData = new FormData();
-      // formData.append("file", file);
-      // await fetch('/api/upload', { method: 'POST', body: formData });
+      // Store the actual File object in formData
+      setFormData((prev) => ({
+        ...prev,
+        profileImage: file, // Store the File object, not the URL
+      }));
     }
   };
 
-  const triggerFileSelect = () => {
-    fileInputRef.current?.click();
+  // Fixed Cover image upload handler
+  const handleCoverFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const imageURL = URL.createObjectURL(file);
+      setSelectedCoverImage(imageURL);
+
+      // Store the actual File object in formData
+      setFormData((prev) => ({
+        ...prev,
+        coverImage: file, // Store the File object, not the URL
+      }));
+    }
+  };
+
+  const triggerProfileFileSelect = () => {
+    profileFileInputRef.current?.click();
+  };
+
+  const triggerCoverFileSelect = () => {
+    coverFileInputRef.current?.click();
   };
 
   return (
     <>
       <div className="relative w-full mb-6">
-        {/* Cover Image */}
-        <div className="relative w-full h-[180px] rounded-2xl overflow-hidden">
-          <Image src="/cover.jpg" alt="Cover" fill className="object-cover" />
+        {/* Cover Image with Upload Button */}
+        <div className="relative w-full h-[180px] rounded-2xl overflow-hidden group">
+          <Image
+            src={selectedCoverImage}
+            alt="Cover"
+            fill
+            className="object-cover"
+          />
+
+          {/* Cover Image Upload Button - positioned over the cover image */}
+          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-200 flex items-center justify-center">
+            <button
+              onClick={triggerCoverFileSelect}
+              className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-white bg-opacity-90 hover:bg-opacity-100 text-gray-800 px-4 py-2 rounded-full text-sm font-medium shadow-lg"
+            >
+              Update Cover Photo
+            </button>
+          </div>
+
+          {/* Hidden cover image file input */}
+          <input
+            type="file"
+            ref={coverFileInputRef}
+            onChange={handleCoverFileChange}
+            accept="image/*"
+            className="hidden"
+          />
         </div>
 
         {/* Info Card */}
@@ -90,11 +286,27 @@ export default function EditProfilePage() {
             <h1 className="text-lg font-bold mb-1">Edit Profile</h1>
             <div className="flex items-center">
               <div className="flex items-center text-gray-500">
-                <Link href="/profile/sellerId" className="hover:text-black">Profile</Link>
-                <svg className='mx-1' width="20" height="20" viewBox="0 0 20 21" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path fillRule="evenodd" clipRule="evenodd" d="M6.98558 5.06864C7.32339 4.7931 7.8211 4.8128 8.13643 5.12775L13.0048 9.99638C13.1679 10.1596 13.2563 10.3779 13.2563 10.6044C13.2563 10.8309 13.1681 11.0488 13.0048 11.2127L8.13633 16.0811C7.80004 16.417 7.2557 16.417 6.92029 16.0811C6.58388 15.7451 6.58388 15.2006 6.92019 14.8648L11.1802 10.6044L6.92029 6.34407C6.60492 6.02908 6.5852 5.53088 6.86112 5.19302L6.92025 5.12769L6.98558 5.06864Z" fill="#343A40" />
+                <Link href="/profile/sellerId" className="hover:text-black">
+                  Profile
+                </Link>
+                <svg
+                  className="mx-1"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 20 21"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    fillRule="evenodd"
+                    clipRule="evenodd"
+                    d="M6.98558 5.06864C7.32339 4.7931 7.8211 4.8128 8.13643 5.12775L13.0048 9.99638C13.1679 10.1596 13.2563 10.3779 13.2563 10.6044C13.2563 10.8309 13.1681 11.0488 13.0048 11.2127L8.13633 16.0811C7.80004 16.417 7.2557 16.417 6.92029 16.0811C6.58388 15.7451 6.58388 15.2006 6.92019 14.8648L11.1802 10.6044L6.92029 6.34407C6.60492 6.02908 6.5852 5.53088 6.86112 5.19302L6.92025 5.12769L6.98558 5.06864Z"
+                    fill="#343A40"
+                  />
                 </svg>
-                <span className="text-orange-500 cursor-default">Edit profile</span>
+                <span className="text-orange-500 cursor-default">
+                  Edit profile
+                </span>
               </div>
             </div>
 
@@ -109,20 +321,22 @@ export default function EditProfilePage() {
                   className="rounded-full border-4 border-white object-cover w-[120px] h-[120px]"
                 />
                 <div className="flex flex-col justify-center">
-                  <p className="text-sm text-gray-700 mb-2 max-w-md">{formData.bio}</p>
+                  <p className="text-sm text-gray-700 mb-2 max-w-md">
+                    {formData.bio}
+                  </p>
 
-                  {/* Hidden file input */}
+                  {/* Hidden profile image file input */}
                   <input
                     type="file"
-                    ref={fileInputRef}
-                    onChange={handleFileChange}
+                    ref={profileFileInputRef}
+                    onChange={handleProfileFileChange}
                     accept="image/*"
                     className="hidden"
                   />
 
-                  {/* Trigger button */}
+                  {/* Profile image trigger button */}
                   <button
-                    onClick={triggerFileSelect}
+                    onClick={triggerProfileFileSelect}
                     className="text-sm border px-4 py-1 rounded hover:bg-gray-100 w-fit"
                   >
                     Update a photo
@@ -171,35 +385,16 @@ export default function EditProfilePage() {
                     Location
                   </h2>
                   <CustomDropdown
-                    // label="Location"
                     value={formData.location}
                     options={provinceOptions}
                     onChange={handleChange("location")}
-
                   />
-
-                  {/* Business Address */}
-                  <section className="mb-6 mt-5">
-                    <h2 className="text-black font-semibold text-lg mb-3">
-                      Business address
-                    </h2>
-                    <Link
-                      href="/location"
-                      className="flex items-center space-x-2 text-orange-500 font-medium hover:opacity-80"
-                    >
-                      <div className="w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center text-white">
-                        <Move className="w-4 h-4" />
-                      </div>
-                      <span>Add Location</span>
-                    </Link>
-                  </section>
 
                   {/* Telegram */}
                   <h2 className="text-black font-semibold text-lg mb-3">
                     Telegram URL
                   </h2>
                   <Input
-                    // label="Telegram URL"
                     placeholder="Your telegram URL"
                     value={formData.telegram}
                     onChange={handleChange("telegram")}
@@ -214,8 +409,6 @@ export default function EditProfilePage() {
                     <p className="text-xs text-gray-500 mb-4 flex items-center gap-1">
                       <svg
                         className="inline-block w-8 md:w-5 lg:w-5 "
-                        // width="20"
-                        // height="18"
                         viewBox="0 0 27 24"
                         fill="none"
                         xmlns="http://www.w3.org/2000/svg"
@@ -248,14 +441,7 @@ export default function EditProfilePage() {
                       dropdownHeight="110px"
                     />
 
-                    {/* <Input
-                      label="Birthday"
-                      type="date"
-                      value={formData.birthday}
-                      onChange={handleChange("birthday")}
-                    /> */}
-
-                    {/* Updated Birthday field using react-datepicker */}
+                    {/* Updated Birthday field */}
                     <div className="mb-4 relative">
                       <label className="block text-sm font-semibold text-gray-900 mb-1 ">
                         Birthday
@@ -265,7 +451,6 @@ export default function EditProfilePage() {
                         value={formData.birthday}
                         onChange={handleChange("birthday")}
                         placeholder="Select your birthday"
-                      // className="w-full border h-[45px] rounded-[24px] border-gray-900 px-3 py-2 text-sm bg-white focus:outline-none focus:border-orange-400"
                       />
                     </div>
                   </section>

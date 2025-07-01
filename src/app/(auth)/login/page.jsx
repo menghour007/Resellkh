@@ -1,6 +1,6 @@
 "use client";
 
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { HiOutlineEye, HiOutlineEyeOff } from "react-icons/hi";
@@ -24,7 +24,7 @@ export default function LoginForm() {
 
     try {
       const response = await fetch(
-        "https://exchange-solely-finest-makers.trycloudflare.com/api/v1/auths/login",
+        "https://phil-whom-hide-lynn.trycloudflare.com/api/v1/auths/login",
         {
           method: "POST",
           headers: {
@@ -41,7 +41,6 @@ export default function LoginForm() {
         setLoading(false);
         return;
       }
-
 
       if (data.token) {
         localStorage.setItem("token", data.token);
@@ -64,36 +63,32 @@ export default function LoginForm() {
     }
   };
 
-  
-
   const handleGoogleLogin = async () => {
     await signIn("google", { callbackUrl: "/" });
   };
-useEffect(() => {
-  if (typeof window === "undefined") return; // 🛡️ Guard against server-side
+  useEffect(() => {
+    if (typeof window === "undefined") return; // 🛡️ Guard against server-side
 
-  if (
-    session?.accessToken &&
-    session?.userId &&
-    session?.email &&
-    session?.role
-  ) {
-    console.log("Storing Google session data to localStorage");
+    if (
+      session?.accessToken &&
+      session?.userId &&
+      session?.email &&
+      session?.role
+    ) {
+      console.log("Storing Google session data to localStorage");
 
-    localStorage.setItem("token", session.accessToken);
-    localStorage.setItem("userId", session.userId);
-    localStorage.setItem("email", session.email);
-    localStorage.setItem("role", session.role);
-    localStorage.setItem("firstName", session.firstName);
-    localStorage.setItem("lastName", session.lastName);
-  }
-}, [session]);
+      localStorage.setItem("token", session.accessToken);
+      localStorage.setItem("userId", session.userId);
+      localStorage.setItem("email", session.email);
+      localStorage.setItem("role", session.role);
+      localStorage.setItem("firstName", session.firstName);
+      localStorage.setItem("lastName", session.lastName);
+    }
+  }, [session]);
 
-useEffect(() => {
-  console.log("🔎 Google session:", session);
-}, [session]);
-
-
+  useEffect(() => {
+    console.log("🔎 Google session:", session);
+  }, [session]);
 
   return (
     <div className="min-h-screen flex items-center justify-center px-6 bg-white">
@@ -109,11 +104,7 @@ useEffect(() => {
 
         <div className="w-full max-w-md mx-auto">
           <div className="flex justify-center mb-6">
-            <img
-              src="/images/auth/logo.jpg"
-              alt="logo"
-              className="w-[130px]"
-            />
+            <img src="/images/auth/logo.jpg" alt="logo" className="w-[130px]" />
           </div>
 
           {error && (
