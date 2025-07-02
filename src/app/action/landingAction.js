@@ -1,3 +1,4 @@
+'use server';
 
 import { getRecommendedProducts } from '@/components/services/landing.service';
 

@@ -2,7 +2,7 @@
 const nextConfig = {
     images: {
      domains: [
-      
+      "gateway.pinata.cloud", "via.placeholder.com"
     ],
      // Add this line if it's not there, or add 'images.unsplash.com' to the array
   },

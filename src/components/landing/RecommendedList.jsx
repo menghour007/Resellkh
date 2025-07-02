@@ -26,18 +26,18 @@ export default function RecommendedList() {
   }, []);
 
   const handleViewMore = () => {
-    setVisibleCount((prev) => prev + 20);
+    setVisibleCount((prev) => prev + 25);
   };
 
   const itemsToShow = recommendedItems.slice(0, visibleCount);
 
-  // if (loading) {
-  //   return (
-  //     <div className="flex justify-center items-center h-64">
-  //       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
-  //     </div>
-  //   );
-  // }
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
+      </div>
+    );
+  }
 
   // if (error) {
   //   return (
@@ -72,8 +72,8 @@ export default function RecommendedList() {
               <ProductCart
                 key={item.id}
                 id={item.id}
-                imageUrl={item.imageUrl}
-                title={item.title}
+                imageUrl={item.fileUrls?.[0] || "/placeholder.jpg"}
+                title={item.productName}
                 description={item.description}
                 price={price.toFixed(2)}
                 originalPrice={item.discountPercent ? item.productPrice : null}
