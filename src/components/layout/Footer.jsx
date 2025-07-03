@@ -12,7 +12,7 @@ export default function Footer() {
         <div>
           <div className="flex items-center gap-2 mb-4">
             <Link href="/">
-            <Image src="/Logo.png" alt="ResellKH Logo" width={100} height={50} />
+            <img src="/Logo.png" alt="ResellKH Logo" width={100} height={50} />
             </Link>
           </div>
           <p className="text-sm text-gray-600 leading-relaxed">

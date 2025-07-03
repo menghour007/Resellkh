@@ -1,3 +1,4 @@
+// File: src/app/(main)/profile/[sellerId]/page.jsx
 "use client";
 
 import ProfileBanner from "@/components/profile/ProfileBanner";
