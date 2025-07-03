@@ -5,6 +5,24 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Cart from "@/components/profile/someComponent/Cart";
 
+export const fetchNearbyProducts = async (latitude, longitude) => {
+  try {
+    const response = await fetch(
+      `https://phil-whom-hide-lynn.trycloudflare.com/api/v1/products/nearby/${latitude}/${longitude}`
+    );
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data.payload || [];
+  } catch (error) {
+    console.error("Error fetching nearby products:", error);
+    throw error;
+  }
+};
+
 export default function ListingNearMePage() {
   const searchParams = useSearchParams();
   const query = searchParams.get("query");
@@ -53,23 +71,6 @@ export default function ListingNearMePage() {
   };
 
   // Function to fetch nearby products
-  const fetchNearbyProducts = async (latitude, longitude) => {
-    try {
-      const response = await fetch(
-        `https://phil-whom-hide-lynn.trycloudflare.com/api/v1/products/nearby/${latitude}/${longitude}`
-      );
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      return data.payload || [];
-    } catch (error) {
-      console.error("Error fetching nearby products:", error);
-      throw error;
-    }
-  };
 
   // Main effect to get location and fetch products
   useEffect(() => {
