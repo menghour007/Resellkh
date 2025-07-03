@@ -4,7 +4,24 @@ import { useState, useEffect } from "react";
 import { FiSearch, FiFilter } from "react-icons/fi";
 import Cart from "@/components/profile/someComponent/Cart";
 
-// Helper function to parse JWT (keep your existing function)
+// Services
+export const fetProductsinProfile = async (token, userId) => {
+  const response = await fetch(
+    `https://phil-whom-hide-lynn.trycloudflare.com/api/v1/products/getproductbyuserid/${userId}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  const data = await response.json();
+  return data;
+};
+
 const parseJwt = (token) => {
   try {
     return JSON.parse(atob(token.split(".")[1]));
@@ -87,22 +104,8 @@ export default function ListingsWithFilter() {
         }
 
         // Update the API endpoint URL to match your actual endpoint
-        const response = await fetch(
-          `https://phil-whom-hide-lynn.trycloudflare.com/api/v1/products/getproductbyuserid/${userId}`,
-          {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
+        const data = await fetProductsinProfile(token, userId);
         console.log("Raw API response:", data);
 
         // Transform and group the data

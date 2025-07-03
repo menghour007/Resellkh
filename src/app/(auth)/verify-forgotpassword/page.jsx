@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -58,11 +58,14 @@ export default function OTPVerification() {
 
     try {
       setLoading(true);
-      const res = await fetch("https://exchange-solely-finest-makers.trycloudflare.com/api/v1/auths/verify-reset-otp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, otp: code }),
-      });
+      const res = await fetch(
+        "https://exchange-solely-finest-makers.trycloudflare.com/api/v1/auths/verify-reset-otp",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, otp: code }),
+        }
+      );
 
       const text = await res.text();
 
@@ -87,11 +90,14 @@ export default function OTPVerification() {
     try {
       setIsResending(true);
 
-      const res = await fetch("https://exchange-solely-finest-makers.trycloudflare.com/api/v1/auths/resend-otp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
+      const res = await fetch(
+        "https://exchange-solely-finest-makers.trycloudflare.com/api/v1/auths/resend-otp",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        }
+      );
 
       const text = await res.text();
       if (!res.ok) throw new Error(text || "Failed to resend OTP.");
@@ -104,21 +110,21 @@ export default function OTPVerification() {
       setIsResending(false);
     }
   };
-    const handleKeyDown = (e, index) => {
-  if (e.key === "Backspace" && otp[index] === "") {
-    if (index > 0) {
-      const prev = document.getElementById(`otp-${index - 1}`);
-      if (prev) prev.focus();
+  const handleKeyDown = (e, index) => {
+    if (e.key === "Backspace" && otp[index] === "") {
+      if (index > 0) {
+        const prev = document.getElementById(`otp-${index - 1}`);
+        if (prev) prev.focus();
+      }
     }
-  }
-};
+  };
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row items-center justify-center bg-white px-4 sm:px-8 md:px-12 lg:px-[210px] py-12 gap-10">
       {/* Left Image */}
       <div className="hidden md:flex lg:w-1/2 justify-center">
         <img
-          src="/images/auth/verify OTP.jpg" 
+          src="/images/auth/verify OTP.jpg"
           alt="OTP Illustration"
           className="w-full max-w-[400px] h-auto"
         />
@@ -129,24 +135,26 @@ export default function OTPVerification() {
         <h2 className="text-2xl font-bold">OTP Verification</h2>
         <p className="text-gray-600 text-sm">
           Enter the OTP sent to{" "}
-          <span className="text-orange-500 font-medium break-words">{email}</span>
+          <span className="text-orange-500 font-medium break-words">
+            {email}
+          </span>
         </p>
 
         <div className="flex justify-center gap-3">
           {otp.map((digit, idx) => (
-        <input
-          key={idx}
-          id={`otp-${idx}`}
-          type="text"
-          inputMode="numeric"
-          maxLength="1"
-          value={digit}
-          onChange={(e) => handleChange(e.target.value, idx)}
-          onKeyDown={(e) => handleKeyDown(e, idx)}
-          onPaste={idx === 0 ? handlePaste : undefined}
-          className="w-12 h-12 border-b-2 text-center text-xl outline-none focus:border-orange-500 transition"
-        />
-      ))}
+            <input
+              key={idx}
+              id={`otp-${idx}`}
+              type="text"
+              inputMode="numeric"
+              maxLength="1"
+              value={digit}
+              onChange={(e) => handleChange(e.target.value, idx)}
+              onKeyDown={(e) => handleKeyDown(e, idx)}
+              onPaste={idx === 0 ? handlePaste : undefined}
+              className="w-12 h-12 border-b-2 text-center text-xl outline-none focus:border-orange-500 transition"
+            />
+          ))}
         </div>
 
         <p className="text-orange-500 text-sm font-medium">

@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useState } from "react";
 import { FiMail } from "react-icons/fi";
@@ -23,7 +23,9 @@ export default function ForgotPassword() {
     setMessage("");
 
     try {
-      const url = `https://exchange-solely-finest-makers.trycloudflare.com/api/v1/auths/forgot-password?email=${encodeURIComponent(email)}`;
+      const url = `https://phil-whom-hide-lynn.trycloudflare.com/api/v1/auths/forgot-password?email=${encodeURIComponent(
+        email
+      )}`;
 
       const res = await fetch(url, {
         method: "POST",
@@ -51,7 +53,7 @@ export default function ForgotPassword() {
       {/* Left Illustration */}
       <div className="hidden lg:flex w-1/2 justify-between">
         <img
-          src="/images/auth/forgotpassword.jpg" 
+          src="/images/auth/forgotpassword.jpg"
           alt="Forgot password illustration"
           className="max-w-[430px] h-auto"
         />
@@ -64,9 +66,12 @@ export default function ForgotPassword() {
         </div>
 
         <div className="text-center lg:text-left">
-          <h1 className="text-xl font-semibold text-gray-900">Forgot Password</h1>
+          <h1 className="text-xl font-semibold text-gray-900">
+            Forgot Password
+          </h1>
           <p className="text-sm text-gray-600 mt-2">
-            Enter your email for the verification process. We will send a 6-digit code to your email.
+            Enter your email for the verification process. We will send a
+            6-digit code to your email.
           </p>
         </div>
 
@@ -94,14 +99,21 @@ export default function ForgotPassword() {
         </form>
 
         {message && (
-          <p className={`text-sm text-center mt-2 ${message.startsWith("✅") ? "text-green-600" : "text-red-500"}`}>
+          <p
+            className={`text-sm text-center mt-2 ${
+              message.startsWith("✅") ? "text-green-600" : "text-red-500"
+            }`}
+          >
             {message}
           </p>
         )}
 
         <p className="text-sm text-center text-gray-600">
           Already remember your password?{" "}
-          <a href="/login" className="text-orange-500 font-medium hover:underline">
+          <a
+            href="/login"
+            className="text-orange-500 font-medium hover:underline"
+          >
             Log in
           </a>
         </p>

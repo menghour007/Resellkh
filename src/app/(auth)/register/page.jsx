@@ -36,8 +36,10 @@ export default function Register() {
 
   const validateForm = () => {
     const newErrors = {};
-    if (!form.firstName.trim()) newErrors.firstName = "Please enter your first name";
-    if (!form.lastName.trim()) newErrors.lastName = "Please enter your last name";
+    if (!form.firstName.trim())
+      newErrors.firstName = "Please enter your first name";
+    if (!form.lastName.trim())
+      newErrors.lastName = "Please enter your last name";
     if (!form.email.trim()) newErrors.email = "Please enter your email";
     if (!form.password) newErrors.password = "Please enter your password";
     if (!form.confirmPassword) {
@@ -64,13 +66,16 @@ export default function Register() {
       setLoading(true);
       setSubmitError("");
       try {
-        const response = await fetch('https://exchange-solely-finest-makers.trycloudflare.com/api/v1/auths/register', {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(form),
-        });
+        const response = await fetch(
+          "https://exchange-solely-finest-makers.trycloudflare.com/api/v1/auths/register",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(form),
+          }
+        );
 
         let result = {};
         try {
@@ -78,18 +83,21 @@ export default function Register() {
           console.log("Response JSON:", result);
         } catch {
           console.error("Failed to parse response as JSON");
-          result = { message: "Failed to parse server response" };  
+          result = { message: "Failed to parse server response" };
         }
 
         if (response.ok) {
           localStorage.setItem("authToken", "mocked-token");
           window.dispatchEvent(new Event("storage"));
           router.push(`/verifyOTP?email=${form.email}`);
-
         } else if (response.status === 401) {
-          setSubmitError("Unauthorized: Make sure the /register endpoint is public.");
+          setSubmitError(
+            "Unauthorized: Make sure the /register endpoint is public."
+          );
         } else {
-          setSubmitError(result?.message || "Registration failed. Please try again.");
+          setSubmitError(
+            result?.message || "Registration failed. Please try again."
+          );
         }
       } catch (err) {
         console.error("Registration error:", err);
@@ -99,8 +107,6 @@ export default function Register() {
       }
     }
   };
-
- 
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row items-center justify-around bg-white px-4 sm:px-6 md:px-12 lg:px-24 xl:px-32">
@@ -125,7 +131,9 @@ export default function Register() {
                 placeholder="Enter First Name"
               />
               {errors.firstName && (
-                <p className="text-[12px] text-red-500 mt-[-14px]">{errors.firstName}</p>
+                <p className="text-[12px] text-red-500 mt-[-14px]">
+                  {errors.firstName}
+                </p>
               )}
             </div>
 
@@ -139,7 +147,9 @@ export default function Register() {
                 placeholder="Enter Last Name"
               />
               {errors.lastName && (
-                <p className="text-[12px] text-red-500 mt-[-14px]">{errors.lastName}</p>
+                <p className="text-[12px] text-red-500 mt-[-14px]">
+                  {errors.lastName}
+                </p>
               )}
             </div>
           </div>
@@ -155,7 +165,9 @@ export default function Register() {
               placeholder="Enter your email"
             />
             {errors.email && (
-              <p className="text-[12px] text-red-500 mt-[-14px]">{errors.email}</p>
+              <p className="text-[12px] text-red-500 mt-[-14px]">
+                {errors.email}
+              </p>
             )}
           </div>
 
@@ -177,7 +189,9 @@ export default function Register() {
               {showPassword ? <HiOutlineEyeOff /> : <HiOutlineEye />}
             </button>
             {errors.password && (
-              <p className="text-[12px] text-red-500 mt-[-14px]">{errors.password}</p>
+              <p className="text-[12px] text-red-500 mt-[-14px]">
+                {errors.password}
+              </p>
             )}
           </div>
 
@@ -199,7 +213,9 @@ export default function Register() {
               {showConfirm ? <HiOutlineEyeOff /> : <HiOutlineEye />}
             </button>
             {errors.confirmPassword && (
-              <p className="text-[12px] text-red-500 mt-[-14px]">{errors.confirmPassword}</p>
+              <p className="text-[12px] text-red-500 mt-[-14px]">
+                {errors.confirmPassword}
+              </p>
             )}
           </div>
 
@@ -217,16 +233,16 @@ export default function Register() {
           <span className="text-gray-400 text-sm">Or</span>
           <hr className="w-1/4 border-gray-300" />
         </div>
-      <button
-        type="button"
-        onClick={() => signIn("google", { callbackUrl: "/" })}
-        className="w-full flex items-center justify-center gap-3 border border-gray-900 p-3 rounded-full hover:bg-gray-50 transition"
-      >
-        <img src="/google-20.png" alt="Google" className="w-5 h-5" />
-        <span className="text-sm font-medium text-gray-700">
-          Continue with Google
-        </span>
-    </button>
+        <button
+          type="button"
+          onClick={() => signIn("google", { callbackUrl: "/" })}
+          className="w-full flex items-center justify-center gap-3 border border-gray-900 p-3 rounded-full hover:bg-gray-50 transition"
+        >
+          <img src="/google-20.png" alt="Google" className="w-5 h-5" />
+          <span className="text-sm font-medium text-gray-700">
+            Continue with Google
+          </span>
+        </button>
         <p className="mt-4 text-center text-sm">
           Already have an account?{" "}
           <a href="/login" className="text-orange-600 font-semibold">
@@ -237,7 +253,7 @@ export default function Register() {
 
       <div className="hidden lg:flex md:ps-10 justify-center mt-14 lg:mt-0">
         <img
-          src="/images/auth/register.jpg" 
+          src="/images/auth/register.jpg"
           alt="Register Illustration"
           width={450}
           height={450}

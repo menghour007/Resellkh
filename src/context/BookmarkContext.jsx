@@ -14,8 +14,9 @@ export const BookmarkProvider = ({ children }) => {
     //     : [...prev, product]
     // );
 
-    
-    const isAlreadyBookmarked = bookmarks.find((item) => item.id === product.id);
+    const isAlreadyBookmarked = bookmarks.find(
+      (item) => item.id === product.id
+    );
 
     if (isAlreadyBookmarked) {
       console.log("Removing bookmark:", product.title); // log removal
@@ -24,31 +25,28 @@ export const BookmarkProvider = ({ children }) => {
       console.log("Adding bookmark:", product.title); // log addition
       setBookmarks((prev) => [...prev, product]);
     }
-
   };
 
-  
   const isBookmarked = (id) => {
     return bookmarks.some((item) => item.id === id);
-  };  
+  };
 
   useEffect(() => {
-  const stored = localStorage.getItem("bookmarks");
-  if (stored) setBookmarks(JSON.parse(stored));
-}, []);
+    const stored = localStorage.getItem("bookmarks");
+    if (stored) setBookmarks(JSON.parse(stored));
+  }, []);
 
-useEffect(() => {
-  localStorage.setItem("bookmarks", JSON.stringify(bookmarks));
-}, [bookmarks]);
+  useEffect(() => {
+    localStorage.setItem("bookmarks", JSON.stringify(bookmarks));
+  }, [bookmarks]);
 
   return (
     <>
-    <BookmarkContext.Provider value={{ bookmarks, toggleBookmark, isBookmarked }}>
-      {children}
-      
-    </BookmarkContext.Provider>
-    
-
+      <BookmarkContext.Provider
+        value={{ bookmarks, toggleBookmark, isBookmarked }}
+      >
+        {children}
+      </BookmarkContext.Provider>
     </>
   );
 };
