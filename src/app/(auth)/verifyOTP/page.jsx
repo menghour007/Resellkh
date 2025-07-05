@@ -24,7 +24,7 @@ export default function OTPVerification() {
     if (timer <= 0) {
       setTimer(60);
       toast.success("OTP resent.");
-      fetch("https://exchange-solely-finest-makers.trycloudflare.com/api/v1/auths/resend-otp", {
+      fetch("https://phil-whom-hide-lynn.trycloudflare.com/api/v1/auths/resend-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),

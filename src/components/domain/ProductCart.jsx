@@ -34,7 +34,7 @@ export default function ProductCart({
     e.stopPropagation(); // Prevent redirect
 
     toggleBookmark({
-      id,
+      productId: id,
       imageUrl,
       title,
       description,

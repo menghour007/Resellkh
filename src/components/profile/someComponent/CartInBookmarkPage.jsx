@@ -39,7 +39,7 @@ export default function CartInBookmarkPage({
       setShowModal(true);
     } else {
       toggleBookmark({
-        id,
+        productId: id,
         imageUrl,
         title,
         description,
@@ -57,7 +57,7 @@ export default function CartInBookmarkPage({
 
   const confirmRemove = () => {
     toggleBookmark({
-      id,
+      productId: id,
       imageUrl,
       title,
       description,
