@@ -3,6 +3,7 @@
 import { useBookmark } from "@/context/BookmarkContext";
 import CartInBookmarkPage from "@/components/profile/someComponent/CartInBookmarkPage";
 import { useEffect, useState } from "react";
+import { fetchFavouritesByUserId } from "@/components/services/Bookmark.service";
 
 // Skeleton loader component
 const SkeletonCard = () => (
@@ -14,15 +15,26 @@ const SkeletonCard = () => (
 );
 
 export default function FavoritePage() {
-  const { bookmarks } = useBookmark();
+  const { bookmarks, setBookmarks, token, userId } = useBookmark();
   const [loading, setLoading] = useState(true);
 
+  // Fetch latest data when component mounts or when token/userId changes
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      setLoading(false);
-    }, 500);
-    return () => clearTimeout(timeout);
-  }, [bookmarks]);
+    const fetchData = async () => {
+      if (!token || !userId) return;
+      setLoading(true);
+      try {
+        const data = await fetchFavouritesByUserId(userId, token);
+        setBookmarks(data || []);
+      } catch (err) {
+        console.error("Failed to fetch updated favorites", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [token, userId]); // Or add a manual reload trigger
 
   const safeBookmarks = Array.isArray(bookmarks) ? bookmarks : [];
 
@@ -56,23 +68,22 @@ export default function FavoritePage() {
             <div className="grid grid-cols-2 sm:grid-cols-2 px-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 justify-items-center">
               {safeBookmarks.map((item) => (
                 <CartInBookmarkPage
-                    key={item.favouriteId}
-                    id={item.productId}
-                    imageUrl={item.product?.fileUrls?.[0] || "/default-image.jpg"}
-                    title={item.product?.productName}
-                    description={item.product?.description}
-                    price={item.product?.productPrice.toFixed(2)}
-                    originalPrice={
-                      item.product?.discountPercent > 0 ? item.product?.originalPrice : null
-                    }
-                    discountText={
-                      item.product?.discountPercent
-                        ? `${item.product?.discountPercent}% OFF`
-                        : null
-                    }
-                    // the card can call toggleBookmark easily.
-                    product={item.product}
-                  />
+                  key={item.favouriteId}
+                  id={item.productId}
+                  imageUrl={item.product?.fileUrls?.[0] || "/default-image.jpg"}
+                  title={item.product?.productName}
+                  description={item.product?.description}
+                  price={item.product?.productPrice.toFixed(2)}
+                  originalPrice={
+                    item.product?.discountPercent > 0 ? item.product?.originalPrice : null
+                  }
+                  discountText={
+                    item.product?.discountPercent
+                      ? `${item.product?.discountPercent}% OFF`
+                      : null
+                  }
+                  product={item.product}
+                />
               ))}
             </div>
           )}

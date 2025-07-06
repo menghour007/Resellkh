@@ -115,12 +115,12 @@ export const BookmarkProvider = ({ children }) => {
   // Provide the data and functions to children
   return (
     <BookmarkContext.Provider
-      value={{ bookmarks, toggleBookmark, isBookmarked, loading }}
+      value={{ bookmarks, toggleBookmark, isBookmarked, loading, setBookmarks,token, userId }}
     >
       {children}
     </BookmarkContext.Provider>
   );
 };
 
-// Custom hook to use the context
+
 export const useBookmark = () => useContext(BookmarkContext);
