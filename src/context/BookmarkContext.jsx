@@ -1,169 +1,126 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import {
   fetchFavouritesByUserId,
   addToFavourites,
   removeFromFavourites,
 } from "@/components/services/Bookmark.service";
 
+// Create a context
 const BookmarkContext = createContext();
 
-function parseJwt(token) {
+// Helper function to decode JWT token
+function decodeToken(token) {
   if (!token) return null;
   try {
-    const base64Url = token.split(".")[1];
-    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-    const jsonPayload = decodeURIComponent(
-      atob(base64)
-        .split("")
-        .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
-        .join("")
-    );
-    return JSON.parse(jsonPayload);
-  } catch (error) {
-    console.error("Failed to decode JWT:", error);
+    const base64 = token.split(".")[1];
+    const decoded = JSON.parse(atob(base64));
+    return decoded;
+  } catch (err) {
+    console.error("Invalid token");
     return null;
   }
 }
 
+// Context Provider component
 export const BookmarkProvider = ({ children }) => {
   const [bookmarks, setBookmarks] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [token, setToken] = useState(null);
   const [userId, setUserId] = useState(null);
+  const [token, setToken] = useState(null);
 
+  // Get token and user ID from localStorage
   useEffect(() => {
-    const storedToken = localStorage.getItem("token");
-    setToken(storedToken);
-    if (storedToken) {
-      const decoded = parseJwt(storedToken);
-      if (decoded && decoded.userId) {
-        setUserId(decoded.userId);
-      } else {
-        console.warn("userId not found in token.");
+    const savedToken = localStorage.getItem("token");
+    if (savedToken) {
+      setToken(savedToken);
+      const user = decodeToken(savedToken);
+      if (user?.userId) {
+        setUserId(user.userId);
       }
     }
   }, []);
 
+  // Fetch bookmarks from the API
   useEffect(() => {
     if (!token || !userId) {
       setLoading(false);
       return;
     }
 
-    const loadBookmarks = async () => {
-      setLoading(true);
-      setError(null);
+    const fetchBookmarks = async () => {
       try {
         const data = await fetchFavouritesByUserId(userId, token);
         setBookmarks(data || []);
-      } catch (error) {
-        console.error("Error fetching bookmarks:", error);
-        setError("Could not load favorites.");
+      } catch (err) {
+        console.error("Failed to fetch favorites:", err);
       } finally {
         setLoading(false);
       }
     };
 
-    loadBookmarks();
+    fetchBookmarks();
   }, [token, userId]);
 
-  // const toggleBookmark = async (product) => {
-  //   if (!token || !product?.productId) {
-  //     console.error("Cannot toggle bookmark: missing token or product ID.");
-  //     console.warn("Token:", token);
-  //     console.warn("Product:", product);
-  //     return;
-  //   }
-
-  //   const existing = bookmarks.find(
-  //     (b) => b.product?.productId === product.productId || b.productId === product.productId
-  //   );
-
-  //   const prevBookmarks = [...bookmarks];
-
-  //   if (existing) {
-  //     setBookmarks((prev) =>
-  //       prev.filter((b) => (b.product?.productId || b.productId) !== product.productId)
-  //     );
-  //     try {
-  //       await removeFromFavourites(product.productId, userId, token);
-  //     } catch (err) {
-  //       console.error("Failed to remove:", err.message);
-  //       setBookmarks(prevBookmarks);
-  //     }
-  //   } else {
-  //     try {
-  //       const res = await addToFavourites(product, token);
-  //       if (res && res.payload) {
-  //         setBookmarks((prev) => [...prev, res.payload]);
-  //       } else {
-  //         throw new Error("Invalid response from server.");
-  //       }
-  //     } catch (err) {
-  //       console.error("Failed to add:", err.message);
-  //     }
-  //   }
-  // };
-
-  // this is new working toggleBookmark function
-
+  // Add or remove product from favorites
   const toggleBookmark = async (product) => {
-  if (!token || !product?.productId || !userId) {
-    console.error("Cannot toggle bookmark: missing token, userId, or product ID.");
-    return;
-  }
+    if (!token || !product?.productId || !userId) {
+      console.error("Missing info: token, productId, or userId");
+      return;
+    }
 
-  const existing = bookmarks.find(
-    (b) => (b.product?.productId || b.productId) === product.productId
-  );
-
-  const prevBookmarks = [...bookmarks];
-
-  if (existing) {
-    setBookmarks((prev) =>
-      prev.filter((b) => (b.product?.productId || b.productId) !== product.productId)
+    const isAlreadyBookmarked = bookmarks.some(
+      (item) =>
+        (item.product?.productId || item.productId) === product.productId
     );
-    try {
-      await removeFromFavourites(product.productId, userId, token);
-    } catch (err) {
-      console.error("Failed to remove:", err.message);
-      setBookmarks(prevBookmarks);
-    }
-  } else {
-    try {
-      const body = {
-        userId,
-        productId: product.productId,
-        createdAt: new Date().toISOString(), // Optional, backend may generate it
-      };
 
-      const res = await addToFavourites(body, token);
-
-      if (res && res.payload) {
-        setBookmarks((prev) => [...prev, res.payload]);
-      } else {
-        throw new Error("Invalid response from server.");
+    if (isAlreadyBookmarked) {
+      // Remove from local state first (optimistic update)
+      setBookmarks((prev) =>
+        prev.filter(
+          (item) =>
+            (item.product?.productId || item.productId) !== product.productId
+        )
+      );
+      try {
+        await removeFromFavourites(product.productId, userId, token);
+      } catch (err) {
+        console.error("Remove failed:", err);
       }
-    } catch (err) {
-      console.error("Failed to add:", err.message);
+    } else {
+      // Add new favorite
+      try {
+        const body = {
+          userId,
+          productId: product.productId,
+          createdAt: new Date().toISOString(),
+        };
+        const res = await addToFavourites(body, token);
+        if (res?.payload) {
+          setBookmarks((prev) => [...prev, res.payload]);
+        }
+      } catch (err) {
+        console.error("Add failed:", err);
+      }
     }
-  }
-};
+  };
 
-
+  // Check if a product is bookmarked
   const isBookmarked = (id) =>
-    bookmarks.some((item) => item.product?.productId === id || item.productId === id);
+    bookmarks.some(
+      (item) => item.product?.productId === id || item.productId === id
+    );
 
+  // Provide the data and functions to children
   return (
     <BookmarkContext.Provider
-      value={{ bookmarks, toggleBookmark, isBookmarked, loading, error }}
+      value={{ bookmarks, toggleBookmark, isBookmarked, loading }}
     >
       {children}
     </BookmarkContext.Provider>
   );
 };
 
+// Custom hook to use the context
 export const useBookmark = () => useContext(BookmarkContext);

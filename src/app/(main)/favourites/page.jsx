@@ -58,16 +58,16 @@ export default function FavoritePage() {
                 <CartInBookmarkPage
                     key={item.favouriteId}
                     id={item.productId}
-                    imageUrl={item.product.fileUrls?.[0] || "/images/default-product.jpg"}
-                    title={item.product.productName}
-                    description={item.product.description}
-                    price={item.product.productPrice.toFixed(2)}
+                    imageUrl={item.product?.fileUrls?.[0] || "/default-image.jpg"}
+                    title={item.product?.productName}
+                    description={item.product?.description}
+                    price={item.product?.productPrice.toFixed(2)}
                     originalPrice={
-                      item.product.discountPercent > 0 ? item.product.originalPrice : null
+                      item.product?.discountPercent > 0 ? item.product?.originalPrice : null
                     }
                     discountText={
-                      item.product.discountPercent
-                        ? `${item.product.discountPercent}% OFF`
+                      item.product?.discountPercent
+                        ? `${item.product?.discountPercent}% OFF`
                         : null
                     }
                     // the card can call toggleBookmark easily.

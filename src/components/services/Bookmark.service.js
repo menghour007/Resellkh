@@ -14,14 +14,14 @@ export async function fetchFavouritesByUserId(userId, token) {
   return Array.isArray(json.payload) ? json.payload : [];
 }
 
-export async function addToFavourites(product, token) {
+export async function addToFavourites(body, token) {
   const res = await fetch(API_BASE, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify(product),
+    body: JSON.stringify(body),
   });
 
   if (!res.ok) throw new Error(await res.text());
