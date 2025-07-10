@@ -11,8 +11,8 @@ const CalendarIcon = () => (
 );
 
 
-// The ShoppingCart component handles payment, shipping, and order totals.
-const ShoppingCart = ({ items }) => {
+// The Order component handles payment, shipping, and order totals.
+const Order = ({ items }) => {
   const router = useRouter(); // 
   const [paymentMethod, setPaymentMethod] = useState('card');
 
@@ -27,20 +27,14 @@ const ShoppingCart = ({ items }) => {
       return items.reduce((sum, item) => sum + item.quantity, 0)
   }, [items]);
 
-  /**
-   * Step 3: Create a handler function for the order button.
-   * This function will navigate to the new payment page.
-   */
   const handleOrderClick = () => {
-    // You can add logic here to save the order details before navigating
-    console.log("Proceeding to payment...");
-    router.push('/payment'); // Navigate to the '/payment' route
+    router.push('/buy/checkout'); // Navigate to the '/checkout' route
   };
 
   return (
     <div className="w-full lg:w-1/2 p-6 lg:p-8">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-800">Shopping Cart</h2>
+        <h2 className="text-2xl font-bold text-gray-800">Order</h2>
         <span className="text-gray-500 font-medium">{totalItems} Items</span>
       </div>
 
@@ -64,7 +58,7 @@ const ShoppingCart = ({ items }) => {
         {/* Shipping & Promo */}
         <div className="mt-6 space-y-4">
           <div>
-            <label htmlFor="shipping" className="block text-sm font-medium text-gray-700 mb-1">Shipping</label>
+            <label htmlFor="shipping" className="block text-sm font-medium text-gray-700 mb-1">Delivery</label>
             <select id="shipping" className="w-full p-3 border border-gray-300 rounded-lg focus:ring-1 focus:outline-none focus:ring-orange-500 focus:border-orange-500 transition">
               <option>Grab Delivery - $2.00</option>
               <option>Bus Delivery - $2.00</option>
@@ -138,4 +132,4 @@ const ShoppingCart = ({ items }) => {
   );
 };
 
-export default ShoppingCart;
+export default Order;

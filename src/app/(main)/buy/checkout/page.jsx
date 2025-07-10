@@ -1,11 +1,14 @@
 'use client';
 
-import React, { useState } from 'react';
-import OrderSummary from '@/components/buy/OrderSummary';
-import ShoppingCart from '@/components/buy/Order';
+import React, { useState, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
+import CheckoutCart from '@/components/buy/CheckoutCart';
+import CheckoutSummary from '@/components/buy/CheckoutSummary';
 
-export default function BuyPage() {
-  
+// --- Main Checkout Page Component ---
+export default function CheckoutPage() {
+  const router = useRouter();
+  // The state still holds the product data, including the quantity for price calculation.
   const [items, setItems] = useState([
     {
       "productId": 1,
@@ -36,22 +39,30 @@ export default function BuyPage() {
     }
   ]);
 
-  const handleRemoveItem = (productIdToRemove) => {
-    setItems(currentItems =>
-      currentItems.filter(item => item.productId !== productIdToRemove)
-    );
+  const handleRemove = (productId) => {
+    setItems(prevItems => prevItems.filter(item => item.productId !== productId));
   };
 
+  const handleCheckout = () => {
+    router.push('/buy/payment');
+  };
+
+  const subtotal = useMemo(() => items.reduce((sum, item) => sum + item.productPrice * item.quantity, 0), [items]);
+  const tax = 20.00;
+  const delivery = 0.00;
+  const total = subtotal + tax + delivery;
+
   return (
-    <main className="bg-gray-50 min-h-screen font-sans">
-      <div className="container mx-auto px-4 py-8 lg:py-12">
-        <div className="flex flex-col lg:flex-row lg:space-x-8">
-          {/* The OrderSummary component displays the list of items */}
-          <OrderSummary items={items} onRemove={handleRemoveItem}  />
-          {/* The ShoppingCart component handles payment and shipping details */}
-          <ShoppingCart items={items} />
-        </div>
+    <div className="bg-gray-50 min-h-screen font-sans p-4 sm:p-6 lg:p-8">
+      <div className="max-w-7xl mx-auto">
+        <CheckoutCart items={items} onRemove={handleRemove} />
+        <CheckoutSummary
+          subtotal={subtotal}
+          delivery={delivery}
+          total={total}
+          onCheckout={handleCheckout}
+        />
       </div>
-    </main>
+    </div>
   );
 }
