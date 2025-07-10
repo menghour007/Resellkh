@@ -2,51 +2,49 @@
 
 import React from 'react';
 
-// --- Icon Components ---
-const PlusIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-  </svg>
-);
-
-const MinusIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
-  </svg>
-);
-
-// The OrderItem component is updated to match your JSON structure.
-const OrderItem = ({ item, onQuantityChange }) => {
-  // Use the first URL from fileUrls for the image, with a fallback.
+const OrderItem = ({ item, onRemove }) => { 
   const imageUrl = item.fileUrls && item.fileUrls.length > 0
     ? item.fileUrls[0]
     : 'https://placehold.co/80x80/e0e0e0/757575?text=No+Image';
 
   return (
-    <div className="flex items-start space-x-4 py-4">
-      <div className="w-20 h-20 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-        <img src={imageUrl} alt={item.productName} className="w-full h-full object-cover" />
-      </div>
-      <div className="flex-grow">
-        <h3 className="font-semibold text-gray-800">{item.productName}</h3>
-        <p className="text-sm text-gray-500 mt-1">
-          <span className="font-medium">Condition:</span> {item.condition}
-        </p>
-        <p className="text-sm text-gray-600 mt-1 line-clamp-2">
-          {item.description}
-        </p>
-      </div>
-      <div className="flex-shrink-0 flex flex-col items-end ml-4">
-        <p className="font-bold text-gray-800">${(item.productPrice * item.quantity).toFixed(2)}</p>
-        <div className="flex items-center border border-gray-200 rounded-md mt-2">
-          <button onClick={() => onQuantityChange(item.productId, -1)} className="p-2 text-gray-500 hover:bg-gray-100 rounded-l-md transition">
-            <MinusIcon />
-          </button>
-          <span className="px-3 text-gray-700 font-medium">{item.quantity}</span>
-          <button onClick={() => onQuantityChange(item.productId, 1)} className="p-2 text-gray-500 hover:bg-gray-100 rounded-r-md transition">
-            <PlusIcon />
-          </button>
+    <div className="flex items-start justify-between space-x-4 py-4">
+      <div className="flex items-start space-x-4">
+        <div className="w-20 h-20 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+          <img src={imageUrl} alt={item.productName} className="w-full h-full object-cover" />
         </div>
+        <div className="flex-grow">
+          <h3 className="font-semibold text-gray-800">{item.productName}</h3>
+          <p className="text-sm text-gray-500 mt-1">
+            <span className="font-medium">Condition:</span> {item.condition}
+          </p>
+          <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+            {item.description}
+          </p>
+        </div>
+      </div>
+      <div className="flex-shrink-0 flex items-center space-x-4 ml-4">
+        <p className="font-bold text-gray-800">${item.productPrice.toFixed(2)}</p>
+        {/* This is the new remove button */}
+        <button
+          onClick={onRemove}
+          className="text-gray-400 hover:text-red-500 transition-colors"
+          aria-label="Remove item"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-5 w-5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <polyline points="3 6 5 6 21 6" />
+            <path d="M19 6L18.4 19.1a2 2 0 0 1-2 1.9H7.6a2 2 0 0 1-2-1.9L5 6m1 0L6 4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2l0 2" />
+          </svg>
+        </button>
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
+import { useRouter } from 'next/navigation'; // Step 1: Import the router
 
 // --- Icon Components ---
 const CalendarIcon = () => (
@@ -12,20 +13,29 @@ const CalendarIcon = () => (
 
 // The ShoppingCart component handles payment, shipping, and order totals.
 const ShoppingCart = ({ items }) => {
+  const router = useRouter(); // 
   const [paymentMethod, setPaymentMethod] = useState('card');
 
-  // Memoized calculation for the subtotal, using 'productPrice'.
   const subtotal = useMemo(() => {
     return items.reduce((sum, item) => sum + item.productPrice * item.quantity, 0);
   }, [items]);
 
-  const deliveryFee = 0; // As per the UI design
+  const deliveryFee = 0;
   const total = subtotal + deliveryFee;
-
-  // Memoized calculation for the total number of items.
+  
   const totalItems = useMemo(() => {
       return items.reduce((sum, item) => sum + item.quantity, 0)
   }, [items]);
+
+  /**
+   * Step 3: Create a handler function for the order button.
+   * This function will navigate to the new payment page.
+   */
+  const handleOrderClick = () => {
+    // You can add logic here to save the order details before navigating
+    console.log("Proceeding to payment...");
+    router.push('/payment'); // Navigate to the '/payment' route
+  };
 
   return (
     <div className="w-full lg:w-1/2 p-6 lg:p-8">
@@ -55,36 +65,36 @@ const ShoppingCart = ({ items }) => {
         <div className="mt-6 space-y-4">
           <div>
             <label htmlFor="shipping" className="block text-sm font-medium text-gray-700 mb-1">Shipping</label>
-            <select id="shipping" className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
-              <option>Second Delivery - $5.00</option>
-              <option>Standard Delivery - $10.00</option>
-              <option>Express Delivery - $15.00</option>
+            <select id="shipping" className="w-full p-3 border border-gray-300 rounded-lg focus:ring-1 focus:outline-none focus:ring-orange-500 focus:border-orange-500 transition">
+              <option>Grab Delivery - $2.00</option>
+              <option>Bus Delivery - $2.00</option>
+              <option>Express Delivery - $2.00</option>
             </select>
           </div>
           {/* <div>
-            <label htmlFor="promo" className="block text-sm font-medium text-gray-700 mb-1">Promo Code</label>
-            <input type="text" id="promo" placeholder="XXXX - XXXX" className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" />
-          </div> */}
+            <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+            <input type="text" id="phone" placeholder="+855" className="w-full p-3 border border-gray-300 rounded-lg focus:ring-1 focus:outline-none focus:ring-orange-500 focus:border-orange-500 transition" />
+          </div>
           <div>
             <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">Address</label>
-            <input type="text" id="address" defaultValue="Alpha Plus, Near Ralya Telephone exchange." className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" />
-          </div>
+            <input type="text" id="address" placeholder="Your Address" className="w-full p-3 border border-gray-300 rounded-lg focus:ring-1 focus:outline-none focus:ring-orange-500 focus:border-orange-500 transition" />
+          </div> */}
         </div>
 
         {/* Payment */}
-        <div className="mt-8">
+        {/* <div className="mt-8">
           <h3 className="text-lg font-semibold text-gray-800 mb-4">Payment</h3>
           <div className="space-y-3">
-            <label className="flex items-center p-3 border border-gray-300 rounded-lg cursor-pointer has-[:checked]:bg-indigo-50 has-[:checked]:border-indigo-500 transition">
-              <input type="radio" name="payment" value="delivery" checked={paymentMethod === 'delivery'} onChange={(e) => setPaymentMethod(e.target.value)} className="h-4 w-4 text-indigo-600 focus:ring-indigo-500" />
+            <label className="flex items-center p-3 border border-gray-300 rounded-lg cursor-pointer has-[:checked]:bg-orange-50 has-[:checked]:border-orange-500 transition">
+              <input type="radio" name="payment" value="delivery" checked={paymentMethod === 'delivery'} onChange={(e) => setPaymentMethod(e.target.value)} className="h-4 w-4 text-orange-600 focus:ring-orange-500" />
               <span className="ml-3 text-sm font-medium text-gray-700">Payment with ABA</span>
             </label>
-            <label className="flex items-center p-3 border border-gray-300 rounded-lg cursor-pointer has-[:checked]:bg-indigo-50 has-[:checked]:border-indigo-500 transition">
-              <input type="radio" name="payment" value="card" checked={paymentMethod === 'card'} onChange={(e) => setPaymentMethod(e.target.value)} className="h-4 w-4 text-indigo-600 focus:ring-indigo-500" />
+            <label className="flex items-center p-3 border border-gray-300 rounded-lg cursor-pointer has-[:checked]:bg-orange-50 has-[:checked]:border-orange-500 transition">
+              <input type="radio" name="payment" value="card" checked={paymentMethod === 'card'} onChange={(e) => setPaymentMethod(e.target.value)} className="h-4 w-4 text-orange-600 focus:ring-orange-500" />
               <span className="ml-3 text-sm font-medium text-gray-700">Card Payment</span>
             </label>
           </div>
-        </div>
+        </div> */}
 
         {/* Card Details */}
         {/* {paymentMethod === 'card' && (
@@ -118,7 +128,9 @@ const ShoppingCart = ({ items }) => {
         <button className="w-1/2 bg-gray-200 text-gray-700 font-bold py-3 rounded-lg hover:bg-gray-300 transition-all duration-300">
           Cancel
         </button>
-        <button className="w-1/2 bg-orange-500 text-white font-bold py-3 rounded-lg hover:bg-orange-600 transition-all duration-300 transform hover:scale-105">
+        <button 
+          onClick={handleOrderClick}
+          className="w-1/2 bg-orange-600 text-white font-bold py-3 rounded-lg hover:bg-orange-600 transition-all duration-300 transform hover:scale-105">
           Order
         </button>
       </div>
