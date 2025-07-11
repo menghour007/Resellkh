@@ -15,8 +15,8 @@ const OrderItem = ({ item, onRemove }) => {
         </div>
         <div className="flex-grow">
           <h3 className="font-semibold text-gray-800">{item.productName}</h3>
-          <p className="text-sm text-gray-500 mt-1">
-            <span className="font-medium">Condition:</span> {item.condition}
+          <p className="text-sm text-gray-800 mt-1">
+            <span className="font-bold">Condition:</span> {item.condition}
           </p>
           <p className="text-sm text-gray-600 mt-1 line-clamp-2">
             {item.description}

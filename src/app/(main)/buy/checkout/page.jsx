@@ -5,10 +5,8 @@ import { useRouter } from 'next/navigation';
 import CheckoutCart from '@/components/buy/CheckoutCart';
 import CheckoutSummary from '@/components/buy/CheckoutSummary';
 
-// --- Main Checkout Page Component ---
 export default function CheckoutPage() {
   const router = useRouter();
-  // The state still holds the product data, including the quantity for price calculation.
   const [items, setItems] = useState([
     {
       "productId": 1,
