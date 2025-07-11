@@ -14,7 +14,7 @@ export default function BuyPage() {
       "description": "Brand new never used. Bought for wedding but not my style to wear formal. Negotiable if u can come and collect. Bought Retail at 25$ Size: 16-34 Non iron, DRY Material feels super comfortable, great for SG weather. Come view to believe it.",
       "condition": "Like New",
       "fileUrls": ["http://localhost:3000/_next/image?url=https%3A%2F%2Fgateway.pinata.cloud%2Fipfs%2FQmSL9cZKQRoB8mcYXBFrVpkUk1NyvwXCdinP7bH7D9UW13&w=1920&q=75"],
-      "quantity": 2
+      "quantity": 1
     },
     {
       "productId": 2,
@@ -32,7 +32,7 @@ export default function BuyPage() {
       "description": "Barely worn and in good-as-new condition. Dark gray slim skinny-fit jeans with a low waist and button placket. W31 L32. Unfortunately I didn’t stay slim long enough to wear them! The slim fit jeans by Diesel Sleenker 069EQ are characterized by fashionable used look effects. Stretch denim with 89% cotton, 9% elasto­multi­ester, 2% elastane.",
       "condition": "New",
       "fileUrls": ["http://localhost:3000/_next/image?url=https%3A%2F%2Fgateway.pinata.cloud%2Fipfs%2FQmXEQPsGhPruCeaKnTNC56KB71Bhzz2S5qtk1EL3ET2E6L&w=1920&q=75"],
-      "quantity": 2
+      "quantity": 1
     }
   ]);
 

@@ -24,7 +24,7 @@ const OrderItem = ({ item, onRemove }) => {
         </div>
       </div>
       <div className="flex-shrink-0 flex items-center space-x-4 ml-4">
-        <p className="font-bold text-gray-800">${item.productPrice.toFixed(2)}</p>
+        <p className="font-medium text-gray-800">${item.productPrice.toFixed(2)}</p>
         {/* This is the new remove button */}
         <button
           onClick={onRemove}
