@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Cart from "@/components/profile/someComponent/Cart";
+import { useRouter } from "next/navigation";
 
 // Skeleton Card Component
 const SkeletonCard = () => (
@@ -23,6 +24,7 @@ export default function ListingsWithFilter({ userId }) {
   const [sortBy, setSortBy] = useState("");
   const [condition, setCondition] = useState("");
   const [status, setStatus] = useState("");
+  const router = useRouter();
 
   useEffect(() => {
     async function fetchProducts() {
@@ -49,13 +51,13 @@ export default function ListingsWithFilter({ userId }) {
         const data = await response.json();
 
         if (Array.isArray(data.payload)) {
-          const formattedProducts = data.payload.map(product => ({
+          const formattedProducts = data.payload.map((product) => ({
             ...product,
-            fileUrls: Array.isArray(product.fileUrls) 
-              ? product.fileUrls.map(url => 
-                  url.startsWith('http') ? url : `https://${url}`
+            fileUrls: Array.isArray(product.fileUrls)
+              ? product.fileUrls.map((url) =>
+                  url.startsWith("http") ? url : `https://${url}`
                 )
-              : []
+              : [],
           }));
           setProducts(formattedProducts);
         } else {
@@ -71,18 +73,28 @@ export default function ListingsWithFilter({ userId }) {
     fetchProducts();
   }, [userId]);
 
+  // Handle edit product
+  const handleEditProduct = (productId) => {
+    router.push(`/edit-product/${productId}`);
+  };
+
   // Filtering and sorting logic
   let filteredProducts = products.filter((p) => {
     const matchesSearch =
-      (p.productName && p.productName.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (p.description && p.description.toLowerCase().includes(searchTerm.toLowerCase()));
+      (p.productName &&
+        p.productName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (p.description &&
+        p.description.toLowerCase().includes(searchTerm.toLowerCase()));
 
     const matchesCondition =
       !condition ||
-      (p.condition && p.condition.toLowerCase().trim() === condition.toLowerCase().trim());
+      (p.condition &&
+        p.condition.toLowerCase().trim() === condition.toLowerCase().trim());
 
     const matchesStatus =
-      !status || (p.productStatus && p.productStatus.toLowerCase() === status.toLowerCase());
+      !status ||
+      (p.productStatus &&
+        p.productStatus.toLowerCase() === status.toLowerCase());
 
     return matchesSearch && matchesCondition && matchesStatus;
   });
@@ -213,7 +225,9 @@ export default function ListingsWithFilter({ userId }) {
               </label>
             </div>
 
-            <div className="text-sm font-medium text-gray-700 mb-2">Item Condition</div>
+            <div className="text-sm font-medium text-gray-700 mb-2">
+              Item Condition
+            </div>
             <div className="space-y-1 mb-3">
               {["new", "like", "lightly", "used", "heavily"].map((c) => (
                 <label key={c} className="block">
@@ -229,7 +243,9 @@ export default function ListingsWithFilter({ userId }) {
               ))}
             </div>
 
-            <div className="text-sm font-medium text-gray-700 mb-2">Listings status</div>
+            <div className="text-sm font-medium text-gray-700 mb-2">
+              Listings status
+            </div>
             <div className="space-y-1 mb-3">
               {["public", "private", "draft", "sold", "on sale"].map((s) => (
                 <label key={s} className="block">
@@ -275,11 +291,12 @@ export default function ListingsWithFilter({ userId }) {
               className="w-[350px] h-auto mb-6"
             />
             <p className="text-sm text-gray-600">
-              <span className="font-semibold">@user</span> doesn't have any listings yet
+              <span className="font-semibold">@user</span> doesn't have any
+              listings yet
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-2 px-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 justify-items-center">
+          <div className="grid grid-cols-2 sm:grid-cols-2 px-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             {filteredProducts.map((item) => {
               const price =
                 typeof item.productPrice === "number"
@@ -288,7 +305,8 @@ export default function ListingsWithFilter({ userId }) {
                     : item.productPrice
                   : 0;
 
-              const firstImageUrl = item.fileUrls?.[0] || "/images/default-product.png";
+              const firstImageUrl =
+                item.fileUrls?.[0] || "/images/default-product.png";
 
               return (
                 <Cart
@@ -298,8 +316,14 @@ export default function ListingsWithFilter({ userId }) {
                   title={item.productName}
                   description={item.description}
                   price={price.toFixed(2)}
-                  originalPrice={item.discountPercent ? item.productPrice : null}
-                  discountText={item.discountPercent ? `${item.discountPercent}% OFF` : null}
+                  originalPrice={
+                    item.discountPercent ? item.productPrice : null
+                  }
+                  discountText={
+                    item.discountPercent ? `${item.discountPercent}% OFF` : null
+                  }
+                  showEditButton={true}
+                  onEdit={handleEditProduct}
                 />
               );
             })}

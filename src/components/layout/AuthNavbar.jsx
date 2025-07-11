@@ -17,8 +17,10 @@ export default function AuthNavbar() {
   const profileRef = useRef(null);
   const router = useRouter();
   const pathname = usePathname();
-  const [categoryOpen, setCategoryOpen] = useState(false);
-  const categoryRef = useRef(null);
+  const [desktopCategoryOpen, setDesktopCategoryOpen] = useState(false);
+  const [mobileCategoryOpen, setMobileCategoryOpen] = useState(false);
+  const desktopCategoryRef = useRef(null);
+  const mobileCategoryRef = useRef(null);
 
   // Corrected category mapping to match backend IDs
   const categoryMap = {
@@ -31,7 +33,7 @@ export default function AuthNavbar() {
     sports_kids: 7,
     electronic: 8,
     vehicle: 9,
-    other: 10
+    other: 10,
   };
 
   // Close profile dropdown on outside click
@@ -40,8 +42,17 @@ export default function AuthNavbar() {
       if (profileRef.current && !profileRef.current.contains(event.target)) {
         setProfileOpen(false);
       }
-      if (categoryRef.current && !categoryRef.current.contains(event.target)) {
-        setCategoryOpen(false);
+      if (
+        desktopCategoryRef.current &&
+        !desktopCategoryRef.current.contains(event.target)
+      ) {
+        setDesktopCategoryOpen(false);
+      }
+      if (
+        mobileCategoryRef.current &&
+        !mobileCategoryRef.current.contains(event.target)
+      ) {
+        setMobileCategoryOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -84,7 +95,10 @@ export default function AuthNavbar() {
         setUser({
           id: userId,
           name: `${firstName || ""} ${lastName || ""}`.trim() || "User",
-          avatar: json.payload?.profileImage || profileImage || "https://media.istockphoto.com/id/1495088043/vector/user-profile-icon-avatar-or-person-icon-profile-picture-portrait-symbol-default-portrait.jpg?s=612x612&w=0&k=20&c=dhV2p1JwmloBTOaGAtaA3AW1KSnjsdMt7-U_3EZElZ0=",
+          avatar:
+            json.payload?.profileImage ||
+            profileImage ||
+            "https://media.istockphoto.com/id/1495088043/vector/user-profile-icon-avatar-or-person-icon-profile-picture-portrait-symbol-default-portrait.jpg?s=612x612&w=0&k=20&c=dhV2p1JwmloBTOaGAtaA3AW1KSnjsdMt7-U_3EZElZ0=",
         });
       } catch (err) {
         console.error("Error fetching user profile:", err);
@@ -96,12 +110,15 @@ export default function AuthNavbar() {
 
     // Optional: listen for auth-change event to update user on login/logout
     window.addEventListener("auth-change", updateUserFromStorage);
-    return () => window.removeEventListener("auth-change", updateUserFromStorage);
+    return () =>
+      window.removeEventListener("auth-change", updateUserFromStorage);
   }, []);
 
   // Close profile dropdown on route change
   useEffect(() => {
     setProfileOpen(false);
+    setDesktopCategoryOpen(false);
+    setMobileCategoryOpen(false);
   }, [pathname]);
 
   const handleLogout = () => {
@@ -159,9 +176,9 @@ export default function AuthNavbar() {
             >
               Book
             </Link>
-            <div className="relative" ref={categoryRef}>
+            <div className="relative" ref={desktopCategoryRef}>
               <button
-                onClick={() => setCategoryOpen(!categoryOpen)}
+                onClick={() => setDesktopCategoryOpen(!desktopCategoryOpen)}
                 className="group flex items-center gap-1 text-gray-800 hover:text-orange-500"
               >
                 <svg
@@ -180,7 +197,7 @@ export default function AuthNavbar() {
                 </span>
               </button>
 
-              {categoryOpen && (
+              {desktopCategoryOpen && (
                 <div className="absolute z-50 mt-2 w-48 bg-white border rounded-xl shadow-lg py-2">
                   <Link
                     href={`/category/${categoryMap.home}`}
@@ -220,10 +237,16 @@ export default function AuthNavbar() {
           <div className="flex items-center gap-4 text-gray-700 text-sm">
             {!user ? (
               <>
-                <Link href="/register" className="hover:text-orange-500 font-medium">
+                <Link
+                  href="/register"
+                  className="hover:text-orange-500 font-medium"
+                >
                   Register
                 </Link>
-                <Link href="/login" className="hover:text-orange-500 font-medium">
+                <Link
+                  href="/login"
+                  className="hover:text-orange-500 font-medium"
+                >
                   Log in
                 </Link>
                 <button
@@ -235,7 +258,10 @@ export default function AuthNavbar() {
               </>
             ) : (
               <>
-                <Link href="/favourites" className="cursor-pointer hover:text-orange-500">
+                <Link
+                  href="/favourites"
+                  className="cursor-pointer hover:text-orange-500"
+                >
                   <svg
                     width="20"
                     height="20"
@@ -250,7 +276,10 @@ export default function AuthNavbar() {
                   </svg>
                 </Link>
 
-                <Link href="/notifications" className="cursor-pointer hover:text-orange-500">
+                <Link
+                  href="/notifications"
+                  className="cursor-pointer hover:text-orange-500"
+                >
                   <div className="relative">
                     <svg
                       className="w-6 h-6 stroke-[1.5] stroke-gray-900"
@@ -286,7 +315,10 @@ export default function AuthNavbar() {
                   />
                   {profileOpen && (
                     <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-xl shadow-lg z-30">
-                      <Link href={`/profile/${user.id}`} className="cursor-pointer">
+                      <Link
+                        href={`/profile/${user.id}`}
+                        className="cursor-pointer"
+                      >
                         <div className="flex items-center gap-3 px-4 py-3 border-b">
                           <img
                             src={user.avatar}
@@ -365,10 +397,10 @@ export default function AuthNavbar() {
               >
                 Equipment
               </Link>
-              
-              <div className="relative" ref={categoryRef}>
+
+              <div className="relative" ref={mobileCategoryRef}>
                 <button
-                  onClick={() => setCategoryOpen(!categoryOpen)}
+                  onClick={() => setMobileCategoryOpen(!mobileCategoryOpen)}
                   className="group flex items-center gap-1 text-gray-800 hover:text-orange-500"
                 >
                   <svg
@@ -387,7 +419,7 @@ export default function AuthNavbar() {
                   </span>
                 </button>
 
-                {categoryOpen && (
+                {mobileCategoryOpen && (
                   <div className="absolute z-50 mt-2 w-[165px] bg-white border rounded-xl shadow-lg py-2">
                     <Link
                       href={`/category/${categoryMap.beauty}`}
