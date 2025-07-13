@@ -81,7 +81,7 @@ export default function ForgotPassword() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
-            <FiMail className="absolute right-4 top-[38px] text-gray-400 text-lg" />
+            {/* <FiMail className="absolute right-4 top-[38px] text-gray-400 text-lg" /> */}
           </div>
 
           <button

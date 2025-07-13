@@ -105,7 +105,7 @@ export default function ResetPassword() {
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Reset Password Field */}
           <div className="relative">
-            <Input
+            <InputFillPassword
               label="Reset Password"
               name="password"
               type={showPassword ? "text" : "password"}
@@ -114,17 +114,12 @@ export default function ResetPassword() {
               placeholder="Enter your new password"
               required
             />
-            <span
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-4 top-[46px] transform -translate-y-1/2 cursor-pointer text-gray-500 text-xl"
-            >
-              {showPassword ? <HiOutlineEyeOff /> : <HiOutlineEye />}
-            </span>
+            
           </div>
 
           {/* Confirm Password Field */}
           <div className="relative">
-            <Input
+            <InputFillPassword
               label="Confirm Password"
               name="confirm"
               type={showConfirm ? "text" : "password"}
@@ -133,12 +128,7 @@ export default function ResetPassword() {
               placeholder="Confirm your password"
               required
             />
-            <span
-              onClick={() => setShowConfirm(!showConfirm)}
-              className="absolute right-4 top-[46px] transform -translate-y-1/2 cursor-pointer text-gray-500 text-xl"
-            >
-              {showConfirm ? <HiOutlineEyeOff /> : <HiOutlineEye />}
-            </span>
+            
           </div>
 
           {/* Submit Button */}

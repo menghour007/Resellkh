@@ -1,5 +1,6 @@
 'use client';
 
+import { Delete } from "lucide-react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -39,14 +40,7 @@ export default function OTPVerification() {
     }
   };
 
-  const handlePaste = (e) => {
-    e.preventDefault();
-    const paste = e.clipboardData.getData("text").trim();
-    if (/^\d{6}$/.test(paste)) {
-      setOtp(paste.split(""));
-      document.getElementById("otp-5")?.focus();
-    }
-  };
+  
 
   const handleVerify = async () => {
     const code = otp.join("");
@@ -134,19 +128,18 @@ export default function OTPVerification() {
 
         <div className="flex justify-center gap-3">
           {otp.map((digit, idx) => (
-        <input
-          key={idx}
-          id={`otp-${idx}`}
-          type="text"
-          inputMode="numeric"
-          maxLength="1"
-          value={digit}
-          onChange={(e) => handleChange(e.target.value, idx)}
-          onKeyDown={(e) => handleKeyDown(e, idx)}
-          onPaste={idx === 0 ? handlePaste : undefined}
-          className="w-12 h-12 border-b-2 text-center text-xl outline-none focus:border-orange-500 transition"
-        />
-      ))}
+            <input
+              key={idx}
+              id={`otp-${idx}`}
+              type="text"
+              inputMode="numeric"
+              maxLength="1"
+              value={digit}
+              onChange={(e) => handleChange(e.target.value, idx)}
+              onKeyDown={(e) => handleKeyDown(e, idx)}
+              className="w-12 h-12 border-b-2 text-center text-xl outline-none focus:border-orange-500 transition"
+            />
+          ))}
         </div>
 
         <p className="text-orange-500 text-sm font-medium">

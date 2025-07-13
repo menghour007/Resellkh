@@ -44,12 +44,41 @@ export default function DealMethod({
   };
 
 
+<<<<<<< HEAD
+=======
+  useEffect(() => {
+    // Get location from location page
+    const saved = localStorage.getItem('meetup_location');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      const name = parsed.name || `${parsed.lat}, ${parsed.lng}`;
+      setLocation(name);
+      setShowLocationInput(true);
+
+      // Replace the saved form draft with this new location
+      const draft = JSON.parse(localStorage.getItem('sell_form_draft') || '{}');
+      draft.location = name;
+      localStorage.setItem('sell_form_draft', JSON.stringify(draft));
+
+      // Clear this so it doesn't auto-run on refresh
+      localStorage.removeItem('meetup_location');
+    }
+
+    // Show input if there's already a value
+    if (location) {
+      setShowLocationInput(true);
+    }
+  }, []);
+>>>>>>> 2ae46c46d22d602588e08349358b04a77243d1f2
 
   return (
     <div className="p-5 border rounded-3xl bg-white space-y-4">
       <p className="font-semibold text-[17px]">Deal Method</p>
 
+<<<<<<< HEAD
       {/* Meet-up Field */}
+=======
+>>>>>>> 2ae46c46d22d602588e08349358b04a77243d1f2
       <div>
         <p className="text-sm text-gray-700 mb-1">Meet-up</p>
 
@@ -92,7 +121,10 @@ export default function DealMethod({
         )}
       </div>
 
+<<<<<<< HEAD
       {/* Telegram Field */}
+=======
+>>>>>>> 2ae46c46d22d602588e08349358b04a77243d1f2
       <div>
         <p className="text-sm text-gray-700 mb-1">Telegram</p>
         <input

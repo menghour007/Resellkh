@@ -65,6 +65,7 @@ export default function PricingInput({ price, setPrice, discount, setDiscount })
           <div className="relative flex-1">
             <span className="absolute top-3 left-5 text-black text-lg">%</span>
             <input
+              
               type="number"
               inputMode="decimal"
               min="0"

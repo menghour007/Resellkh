@@ -112,11 +112,21 @@ export default function PhotoUploader({ files, setFiles }) {
                   </button>
                 </div>
 
-                <img
-                  src={URL.createObjectURL(file)}
-                  alt={`preview-${index}`}
-                  className="w-full h-48 object-cover"
-                />
+                {(() => {
+                    const url = URL.createObjectURL(file);
+                    const isImage = file.type.startsWith('image');
+                    const isVideo = file.type.startsWith('video');
+
+                    if (isImage) {
+                      return <img src={url} alt={`preview-${index}`} className="w-full h-48 object-cover" />;
+                    } else if (isVideo) {
+                      return <video controls src={url} className="w-full h-48 object-cover" />;
+                    } else {
+                      return null;
+                    }
+                    })()
+                }
+
               </div>
             ))}
           </div>

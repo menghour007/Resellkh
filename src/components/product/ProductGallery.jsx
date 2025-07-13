@@ -31,6 +31,7 @@ const ProductGallery = ({ product }) => {
                 : 'border-gray-200 hover:border-gray-300'
             }`}
           >
+<<<<<<< HEAD
             <Image
               src={src}
               alt={`Thumbnail ${index + 1}`}
@@ -39,6 +40,26 @@ const ProductGallery = ({ product }) => {
               className="object-cover"
             />
             {src.endsWith('.mp4') && (
+=======
+            {itemSrc.endsWith('.mp4') ? (
+              <video
+                src={itemSrc}
+                className="object-cover w-full h-full"
+                muted
+                playsInline
+              />
+            ) : (
+              <Image
+                src={itemSrc}
+                alt={`Product thumbnail ${index + 1}`}
+                width={70}
+                height={70}
+                className="object-cover w-full h-full"
+              />
+            )}
+  
+            {itemSrc.endsWith('.mp4') && (
+>>>>>>> 2ae46c46d22d602588e08349358b04a77243d1f2
               <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40">
                 <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M8 5v14l11-7z" />

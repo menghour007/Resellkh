@@ -12,12 +12,20 @@ const SkeletonCard = () => (
     <div className="h-4 bg-gray-200 rounded w-1/2" />
   </div>
 );
+<<<<<<< HEAD
+=======
+
+const API_URL = "https://phil-whom-hide-lynn.trycloudflare.com/api/v1/products";
+>>>>>>> 2ae46c46d22d602588e08349358b04a77243d1f2
 
 export default function RecommendedList() {
   const [items, setItems] = useState([]);
   const [visibleCount, setVisibleCount] = useState(25);
   const [loading, setLoading] = useState(true);
+<<<<<<< HEAD
   const [loadingMore, setLoadingMore] = useState(false);
+=======
+>>>>>>> 2ae46c46d22d602588e08349358b04a77243d1f2
   const [error, setError] = useState(null);
 
   const handleViewMore = () => {
@@ -34,8 +42,20 @@ export default function RecommendedList() {
       setLoading(true);
       setError(null);
       try {
+<<<<<<< HEAD
         const products = await productService.fetchRecommendedProducts();
         setItems(products);
+=======
+        const token = localStorage.getItem("token");
+
+        const res = await fetch(API_URL, {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
+
+        if (!res.ok) throw new Error(`Failed to fetch: ${res.status}`);
+        const data = await res.json();
+        setItems(data.payload || []);
+>>>>>>> 2ae46c46d22d602588e08349358b04a77243d1f2
       } catch (err) {
         setError(err.message);
       } finally {

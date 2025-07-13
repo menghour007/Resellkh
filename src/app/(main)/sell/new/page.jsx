@@ -9,6 +9,7 @@ import ConditionSelector from '@/components/sell/ConditionSelector';
 import ItemDetailForm from '@/components/sell/ItemDetailForm';
 import DealMethod from '@/components/sell/DealMethod';
 import PricingInput from '@/components/sell/PricingInput';
+<<<<<<< HEAD
 import { postProduct } from '@/components/services/postProduct.service';
 
 const staticCategories = [
@@ -23,6 +24,12 @@ const staticCategories = [
   { id: 9, name: 'Vehicle' },
   { id: 10, name: 'Other' },
 ];
+=======
+// import Footer from '@/components/layout/Footer';
+import { useEffect} from 'react';
+import { useRouter } from 'next/navigation';
+import { createProduct } from '@/components/services/sell.service';
+>>>>>>> 2ae46c46d22d602588e08349358b04a77243d1f2
 
 export const SellNewPage = () => {
   const router = useRouter();
@@ -38,6 +45,7 @@ export const SellNewPage = () => {
   const [telegram, setTelegram] = useState('');
   const [price, setPrice] = useState('');
   const [discount, setDiscount] = useState('');
+<<<<<<< HEAD
   const [latLng, setLatLng] = useState({ lat: null, lng: null });
   const [latitude, setLatitude] = useState(null);
   const [longitude, setLongitude] = useState(null);
@@ -49,6 +57,31 @@ export const SellNewPage = () => {
       router.push("/login?redirect=/sell");
     }
   }, [status, router]);
+=======
+  
+ const handleSubmit = async () => {
+  const formData = new FormData();
+  files.forEach(file => {
+    formData.append('images', file);
+  });
+  
+  formData.append('title', title);
+  formData.append('category', category);
+  formData.append('price', price);
+  formData.append('discount', discount);
+  formData.append('description', description);
+  formData.append('condition', condition);
+  formData.append('location', location);
+  formData.append('telegram', telegram);
+
+  const result = await createProduct(formData);
+  if (result.success !== false) {
+    router.push('/profile/seller');
+  } else {
+    alert("Error: " + result.error);
+  }
+};
+>>>>>>> 2ae46c46d22d602588e08349358b04a77243d1f2
 
   // Restore uploaded image files from localStorage
   useEffect(() => {
@@ -92,6 +125,7 @@ export const SellNewPage = () => {
       return;
     }
 
+<<<<<<< HEAD
     if (!price || isNaN(parseFloat(price))) {
       alert('Please enter a valid price');
       return;
@@ -145,6 +179,16 @@ export const SellNewPage = () => {
       <div className="flex justify-center items-center h-64">
         <div className="text-center">
           <p>Redirecting to login...</p>
+=======
+        {/* Bottom Button */}
+        <div className="text-end mt-8">
+          <button
+            className="px-6 py-2 mt-2 bg-orange-500 text-white rounded-full hover:bg-orange-600 transition"
+            onClick={handleSubmit}
+            >
+            List now
+          </button>
+>>>>>>> 2ae46c46d22d602588e08349358b04a77243d1f2
         </div>
       </div>
     );

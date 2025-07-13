@@ -50,7 +50,7 @@ export default function ProductCart({
     }
 
     toggleBookmark({
-      id,
+      productId: id,
       imageUrl,
       title,
       description,

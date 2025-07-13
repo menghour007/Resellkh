@@ -3,10 +3,14 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { HiOutlineEye, HiOutlineEyeOff } from "react-icons/hi";
 import Input from "@/components/ui/Input";
+<<<<<<< HEAD
 import { signIn, useSession, getSession } from "next-auth/react";
 import TokenStorage from "@/components/TokenStorage";
+=======
+import InputFillPassword from "@/components/ui/InputFillPassword";
+import { signIn } from "next-auth/react";
+>>>>>>> 2ae46c46d22d602588e08349358b04a77243d1f2
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
@@ -103,7 +107,7 @@ export default function LoginForm() {
             />
 
             <div className="relative">
-              <Input
+              <InputFillPassword
                 label="Password"
                 name="password"
                 type={showPassword ? "text" : "password"}
@@ -112,6 +116,7 @@ export default function LoginForm() {
                 placeholder="Enter your password"
                 required
               />
+<<<<<<< HEAD
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
@@ -120,6 +125,9 @@ export default function LoginForm() {
               >
                 {showPassword ? <HiOutlineEyeOff /> : <HiOutlineEye />}
               </button>
+=======
+              
+>>>>>>> 2ae46c46d22d602588e08349358b04a77243d1f2
               <div className="text-right mt-1">
                 <a
                   href="/forgotpassword"
