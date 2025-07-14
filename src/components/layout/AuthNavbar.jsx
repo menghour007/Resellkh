@@ -1,3 +1,5 @@
+// 'use client' directive is used in Next.js to mark a component as a Client Component.
+// This allows for client-side interactivity, state, and effects.
 "use client";
 
 import { useState, useEffect, useRef } from "react";
@@ -8,6 +10,7 @@ import Link from "next/link";
 import ImageScanModal from "./navbar/ImageScanModal";
 import ConfirmLogout from "./navbar/Confirmlogout";
 import { signOut } from "next-auth/react";
+import { Store, LayoutDashboard, ShoppingCart } from "lucide-react"; // Import ShoppingCart icon
 
 export default function AuthNavbar() {
   const [user, setUser] = useState(null);
@@ -21,6 +24,9 @@ export default function AuthNavbar() {
   const [mobileCategoryOpen, setMobileCategoryOpen] = useState(false);
   const desktopCategoryRef = useRef(null);
   const mobileCategoryRef = useRef(null);
+
+  // Sample static cart item count for the badge
+  const cartItemCount = 3; // This would typically come from a state or context in a real app
 
   // Corrected category mapping to match backend IDs
   const categoryMap = {
@@ -67,6 +73,7 @@ export default function AuthNavbar() {
       const firstName = localStorage.getItem("firstName");
       const lastName = localStorage.getItem("lastName");
       const profileImage = localStorage.getItem("profileImage");
+      const userRole = localStorage.getItem("role"); // Assuming role is stored here
 
       if (!token || !userId) {
         setUser(null);
@@ -92,6 +99,9 @@ export default function AuthNavbar() {
 
         const json = await res.json();
 
+        // Determine isSellerFormCompleted based on your backend response or local storage role
+        const isSellerStatus = json.payload?.is_seller || false; // Adjust this line based on your actual API response field
+
         setUser({
           id: userId,
           name: `${firstName || ""} ${lastName || ""}`.trim() || "User",
@@ -99,6 +109,7 @@ export default function AuthNavbar() {
             json.payload?.profileImage ||
             profileImage ||
             "https://media.istockphoto.com/id/1495088043/vector/user-profile-icon-avatar-or-person-icon-profile-picture-portrait-symbol-default-portrait.jpg?s=612x612&w=0&k=20&c=dhV2p1JwmloBTOaGAtaA3AW1KSnjsdMt7-U_3EZElZ0=",
+          isSellerFormCompleted: isSellerStatus, // Ensure this property is set
         });
       } catch (err) {
         console.error("Error fetching user profile:", err);
@@ -132,6 +143,16 @@ export default function AuthNavbar() {
     setShowLogoutModal(false);
     setUser(null);
     signOut({ callbackUrl: "/" });
+  };
+
+  const handleBecomeSellerClick = () => {
+    setProfileOpen(false);
+    router.push("/seller/register");
+  };
+
+  const handleSellerDashboardClick = () => {
+    setProfileOpen(false);
+    router.push("/seller/dashboard");
   };
 
   return (
@@ -258,6 +279,21 @@ export default function AuthNavbar() {
               </>
             ) : (
               <>
+                {/* Shopping Cart Icon with Badge */}
+                <Link
+                  href="/buy/payment" // Link to your cart page
+                  className="cursor-pointer hover:text-orange-500"
+                >
+                  <div className="relative">
+                    <ShoppingCart className="w-6 h-6 stroke-[1.5] stroke-gray-900" />
+                    {cartItemCount > 0 && (
+                      <span className="absolute -top-1 -right-1.5 w-4 h-4 flex items-center justify-center bg-orange-500 text-white text-xs font-bold rounded-full">
+                        {cartItemCount}
+                      </span>
+                    )}
+                  </div>
+                </Link>
+
                 <Link
                   href="/favourites"
                   className="cursor-pointer hover:text-orange-500"
@@ -313,7 +349,7 @@ export default function AuthNavbar() {
                     className="rounded-full object-cover cursor-pointer"
                     onClick={() => setProfileOpen((prev) => !prev)}
                   />
-                  {profileOpen && (
+                  {profileOpen && user && (
                     <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-xl shadow-lg z-30">
                       <Link
                         href={`/profile/${user.id}`}
@@ -329,7 +365,9 @@ export default function AuthNavbar() {
                           />
                           <div>
                             <p className="text-sm font-medium text-gray-900">
-                              {user.name}
+                              {user.isSellerFormCompleted
+                                ? `${user.name} (SELLER)`
+                                : user.name}
                             </p>
                             <p className="text-xs text-gray-500">
                               View your profile
@@ -337,6 +375,26 @@ export default function AuthNavbar() {
                           </div>
                         </div>
                       </Link>
+
+                      {true ? (
+                        <button
+                          onClick={handleSellerDashboardClick}
+                          className="w-full px-4 py-3 flex items-center gap-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 border-b transition-all duration-200"
+                        >
+                          <LayoutDashboard className="w-5 h-5 text-orange-500" />{" "}
+                          {/* Dashboard Icon */}
+                          <span className="ps-2">Seller Dashboard</span>
+                        </button>
+                      ) : (
+                        <button
+                          onClick={handleBecomeSellerClick}
+                          className="w-full px-4 py-3 flex items-center gap-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 border-b transition-all duration-200 group"
+                        >
+                          <Store className="w-5 h-5 text-orange-500 group-hover:text-orange-600" />
+                          <span className="ps-2">Become a Seller</span>
+                        </button>
+                      )}
+
                       <button
                         onClick={() => setShowLogoutModal(true)}
                         className="w-full px-4 py-3 rounded-b-xl flex items-center gap-2 text-sm text-gray-700 hover:bg-gray-100"

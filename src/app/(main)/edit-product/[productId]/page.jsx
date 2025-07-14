@@ -230,47 +230,6 @@ export default function EditProductPage({ params }) {
       setIsLoading(false);
     }
   };
-
-  //   const handleDelete = async () => {
-  //     if (
-  //       !confirm(
-  //         "Are you sure you want to delete this product? This action cannot be undone."
-  //       )
-  //     ) {
-  //       return;
-  //     }
-
-  //     setIsLoading(true);
-
-  //     try {
-  //       const token = localStorage.getItem("token"); // Get the token from localStorage
-
-  //       const response = await fetch(
-  //         `https://phil-whom-hide-lynn.trycloudflare.com/api/v1/products/${productId}`, // Ensure the correct endpoint for deletion
-  //         {
-  //           method: "DELETE",
-  //           headers: {
-  //             Authorization: `Bearer ${token}`,
-  //             "Content-Type": "application/json",
-  //           },
-  //         }
-  //       );
-
-  //       if (!response.ok) {
-  //         const errorData = await response.json();
-  //         throw new Error(errorData.message || "Failed to delete product");
-  //       }
-
-  //       const data = await response.json();
-  //       alert(data.message || "Product deleted successfully!"); // Use the API's success message
-  //       router.push(`/profile/${session.user.id}`); // Redirect after deletion
-  //     } catch (error) {
-  //       console.error("Delete Error:", error);
-  //       alert(`Delete failed: ${error.message}`);
-  //     } finally {
-  //       setIsLoading(false);
-  //     }
-  //   };
   // Your existing handleDelete function in EditProductPage.js
 
   const handleDelete = async () => {
