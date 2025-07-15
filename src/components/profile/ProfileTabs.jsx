@@ -1,7 +1,8 @@
+// ProfileTabs.jsx (or .js)
 import ListingsWithFilter from "./ListingWithFilter";
 import ReviewsSection from "./ReviewsSection";
 
-export default function ProfileTabs({ activeTab, setActiveTab }) {
+export default function ProfileTabs({ sellerId, activeTab, setActiveTab }) {
   return (
     <div className="w-full py-8">
       <div className="flex px-6 space-x-6 mb-4">
@@ -28,9 +29,9 @@ export default function ProfileTabs({ activeTab, setActiveTab }) {
       </div>
 
       {activeTab === "listings" ? (
-        <ListingsWithFilter />
+        <ListingsWithFilter userId={sellerId} />
       ) : (
-       <ReviewsSection setActiveTab={setActiveTab} />
+        <ReviewsSection sellerId={sellerId} setActiveTab={setActiveTab} />
       )}
     </div>
   );

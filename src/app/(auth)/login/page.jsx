@@ -17,54 +17,65 @@ export default function LoginForm() {
   const router = useRouter();
   const { status } = useSession();
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
+ const handleLogin = async (e) => {
+  e.preventDefault();
+  setLoading(true);
+  setError("");
 
+  try {
+    // Step 1: Call your backend to validate credentials
+    const response = await fetch(
+      "https://phil-whom-hide-lynn.trycloudflare.com/api/v1/auths/login",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      }
+    );
+
+    const text = await response.text();
+    let data;
     try {
-      // Step 1: Call your backend to validate credentials
-      const response = await fetch(
-        "https://phil-whom-hide-lynn.trycloudflare.com/api/v1/auths/login",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password }),
-        }
-      );
-
-      const text = await response.text();
-      let data;
-      try {
-        data = text ? JSON.parse(text) : {};
-      } catch {
-        data = { message: text };
-      }
-
-      if (!response.ok) {
-        throw new Error(data.message || "Login failed");
-      }
-
-      // Step 2: Call NextAuth signIn (CredentialsProvider)
-      const result = await signIn("credentials", {
-        redirect: false,
-        email,
-        password,
-      });
-
-      if (result?.error) {
-        throw new Error(result.error);
-      }
-
-      // Step 3: Refresh session to trigger TokenStorage
-      await getSession();
-      router.push("/");
-    } catch (err) {
-      setError(err.message || "Something went wrong");
-    } finally {
-      setLoading(false);
+      data = text ? JSON.parse(text) : {};
+    } catch {
+      data = { message: text };
     }
-  };
+
+    if (!response.ok) {
+      throw new Error(data.message || "Login failed");
+    }
+
+    // ✅ Save token and userId in localStorage
+    if (data.token && data.userId) {
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("userId", data.userId.toString());
+    } else {
+      throw new Error("Invalid login response: token or userId missing");
+    }
+
+    // Step 2: Trigger NextAuth sign-in to sync with session
+    const result = await signIn("credentials", {
+      redirect: false,
+      email,
+      password,
+    });
+
+    if (result?.error) {
+      throw new Error(result.error);
+    }
+
+    // Step 3: Refresh session to trigger TokenStorage
+    await getSession();
+
+    // ✅ Redirect after successful login
+    router.push("/");
+  } catch (err) {
+    setError(err.message || "Something went wrong");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const handleGoogleLogin = () => {
     signIn("google", { callbackUrl: "/" });

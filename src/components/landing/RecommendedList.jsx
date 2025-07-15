@@ -1,7 +1,8 @@
-"use client";
+'use client';
 
 import { useState, useEffect } from "react";
 import ProductCart from "../domain/ProductCart";
+import { productService } from "../services/allProduct.service";
 
 // Skeleton loader component
 const SkeletonCard = () => (
@@ -12,16 +13,20 @@ const SkeletonCard = () => (
   </div>
 );
 
-const API_URL = "https://phil-whom-hide-lynn.trycloudflare.com/api/v1/products";
-
 export default function RecommendedList() {
   const [items, setItems] = useState([]);
   const [visibleCount, setVisibleCount] = useState(25);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState(null);
 
   const handleViewMore = () => {
-    setVisibleCount((prev) => prev + 25);
+    setLoadingMore(true);
+    // Simulate network delay for demo purposes
+    setTimeout(() => {
+      setVisibleCount((prev) => prev + 25);
+      setLoadingMore(false);
+    }, 800);
   };
 
   useEffect(() => {
@@ -29,15 +34,8 @@ export default function RecommendedList() {
       setLoading(true);
       setError(null);
       try {
-        const token = localStorage.getItem("token");
-
-        const res = await fetch(API_URL, {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-        });
-
-        if (!res.ok) throw new Error(`Failed to fetch: ${res.status}`);
-        const data = await res.json();
-        setItems(data.payload || []);
+        const products = await productService.fetchRecommendedProducts();
+        setItems(products);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -101,9 +99,19 @@ export default function RecommendedList() {
           <div className="text-center mt-8">
             <button
               onClick={handleViewMore}
-              className="px-6 py-2 mt-2 bg-orange-500 text-white rounded-full hover:bg-orange-600 transition"
+              disabled={loadingMore}
+              className={`px-6 py-2 mt-2 bg-orange-500 text-white rounded-full hover:bg-orange-600 transition flex items-center justify-center mx-auto ${
+                loadingMore ? "opacity-75 cursor-not-allowed" : ""
+              }`}
             >
-              View more
+              {loadingMore ? (
+                <>
+                  <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white mr-2"></div>
+                  Loading...
+                </>
+              ) : (
+                "View more"
+              )}
             </button>
           </div>
         )}

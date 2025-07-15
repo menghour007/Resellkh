@@ -1,116 +1,110 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FaStar } from 'react-icons/fa';
 
-const reviewsData = [
-  {
-    id: 1,
-    name: "Molly",
-    date: "2025-05-08",
-    rating: 5,
-    comment: "Great and friendly seller, and the dress I bought was even better than I had expected. It's probably the prettiest thing I own in my closet now. Super happy with my item!",
-    avatar: "/images/profile/Mollyy.jpg"
-  },
-  {
-    id: 2,
-    name: "Rofath Nii",
-    date: "2025-03-22",
-    rating: 5,
-    comment: "Great seller & pleasant exp 💕",
-    avatar: "/images/profile/Rofath Nii.jpg"
-  },
-  {
-    id: 3,
-    name: "Engelina",
-    date: "2025-03-18",
-    rating: 4,
-    comment: "Seller was very nice and kind, tho meeting up can be quite troublesome. I'm thankful she still made the effort to pass me the shirt after her work! Thank you.",
-    avatar: "/images/profile/Engelina.jpg"
-  },
-  {
-    id: 4,
-    name: "Christari",
-    date: "2025-03-16",
-    rating: 5,
-    comment: "Nice and friendly seller that can deal with you. Straightforward transaction. Seller was friendly and flexible with the meetup location. Appreciate the kind gesture too.",
-    avatar: "/images/profile/Christari.jpg"
-  },
-  {
-    id: 5,
-    name: "chitorita chu",
-    date: "2025-03-22",
-    rating: 5,
-    comment: "Smooth transaction & trust worthy! Recommended seller.",
-    avatar: "/images/profile/rabbit.jpg"
-  },
-  {
-    id: 6,
-    name: "Heng Yew Chye",
-    date: "2025-03-16",
-    rating: 5,
-    comment: "Adorable socks of great quality and fantastic price! Seller sent out so quickly — we received it the very next day in the mailbox! Really really appreciate! Thanks so much :)",
-    avatar: "/images/profile/Heng Yew Chye.jpg"
-  },
-  {
-    id: 7,
-    name: "Christa",
-    date: "2025-03-16",
-    rating: 5,
-    comment: "Fast to deal with. Great seller.",
-    avatar: "/images/profile/Christa.jpg"
-  }
-];
-
-
-const ReviewsSection = ({ setActiveTab }) => {
+const ReviewsSection = ({ setActiveTab,sellerId }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [sortOrder, setSortOrder] = useState('Newest');
+  const [reviews, setReviews] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [visibleCount, setVisibleCount] = useState(3);
 
-  const sortedReviews = [...reviewsData].sort((a, b) => {
-    const dateA = new Date(a.date);
-    const dateB = new Date(b.date);
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const fetchReviews = async () => {
+      try {
+        const response = await fetch(`https://phil-whom-hide-lynn.trycloudflare.com/api/v1/ratings/${sellerId}`, {
+          headers: {
+            'Accept': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch reviews');
+        }
+        
+        const data = await response.json();
+        setReviews(data.payload || []);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchReviews();
+  }, []);
+
+  const sortedReviews = [...reviews].sort((a, b) => {
+    const dateA = new Date(a.createdAt);
+    const dateB = new Date(b.createdAt);
     return sortOrder === 'Newest' ? dateB - dateA : dateA - dateB;
   });
 
-  const [visibleCount, setVisibleCount] = useState(3);
-
   const handleViewMore = () => {
-    setVisibleCount((prev) => prev + 3); // load 3 more on each click
+    setVisibleCount((prev) => prev + 3);
   };
+
+  // Calculate average rating
+  const averageRating = reviews.length > 0 
+    ? (reviews.reduce((sum, review) => sum + review.score, 0) / reviews.length).toFixed(2)
+    : 0;
+
+  if (loading) {
+    return (
+      <div className="p-4 md:p-6">
+        <div className="bg-white p-4 rounded-[24px] border border-gray-200">
+          <div className="flex justify-center items-center h-40">
+            <p>Loading reviews...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-4 md:p-6">
+        <div className="bg-white p-4 rounded-[24px] border border-gray-200">
+          <div className="text-red-500 text-center py-6">
+            Error loading reviews: {error}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-4 md:p-6">
       <div className="bg-white p-4 rounded-[24px] border border-gray-200">
-        {/* Header - Always show title, conditionally show rating */}
-        <div className={`flex flex-col md:flex-row justify-between items-start md:items-center mb-6 pb-4 ${sortedReviews.length > 0 ? 'border-b border-gray-300' : ''}`}>
-          {/* Left: Always show Reviews */}
-          <div >
+        <div className={`flex flex-col md:flex-row justify-between items-start md:items-center mb-6 pb-4 ${reviews.length > 0 ? 'border-b border-gray-300' : ''}`}>
+          <div>
             <h2 className="text-lg font-semibold mt-1 text-gray-800">Reviews</h2>
 
-            {/* Conditionally show rating summary */}
-            {sortedReviews.length > 0 && (
-              <div className="flex flex-col items-start gap-1 mt-1 ">
-                <span className="text-2xl font-bold text-gray-900">4.50</span>
+            {reviews.length > 0 && (
+              <div className="flex flex-col items-start gap-1 mt-1">
+                <span className="text-2xl font-bold text-gray-900">{averageRating}</span>
                 <div className="flex items-center space-x-1">
                   {[...Array(5)].map((_, i) => (
                     <FaStar
                       key={i}
                       size={16}
-                      className={i < 4 ? 'text-orange-500' : 'text-gray-300'}
+                      className={i < Math.floor(averageRating) ? 'text-orange-500' : 'text-gray-300'}
                     />
                   ))}
                 </div>
-                <span className="text-sm text-gray-500">59 reviews</span>
+                <span className="text-sm text-gray-500">{reviews.length} reviews</span>
               </div>
             )}
           </div>
 
-          {/* Right: Sort by dropdown (only if reviews exist) */}
-          {sortedReviews.length > 0 && (
+          {reviews.length > 0 && (
             <div className="relative mt-4 md:mt-0">
               <span className="absolute -top-2 right-7 bg-white px-1 text-[10px] text-gray-500 font-medium">
-                Short by
+                Sort by
               </span>
               <button
                 onClick={() => setIsOpen((prev) => !prev)}
@@ -118,8 +112,7 @@ const ReviewsSection = ({ setActiveTab }) => {
               >
                 {sortOrder}
                 <svg
-                  className={`w-4 h-4 ml-1 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''
-                    }`}
+                  className={`w-4 h-4 ml-1 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
                   viewBox="0 0 23 23"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
@@ -143,8 +136,7 @@ const ReviewsSection = ({ setActiveTab }) => {
                           setSortOrder(option);
                           setIsOpen(false);
                         }}
-                        className={`px-4 py-2 cursor-pointer text-sm hover:bg-gray-100 ${sortOrder === option ? 'font-medium text-black' : 'text-gray-700'
-                          }`}
+                        className={`px-4 py-2 cursor-pointer text-sm hover:bg-gray-100 ${sortOrder === option ? 'font-medium text-black' : 'text-gray-700'}`}
                       >
                         {option}
                       </li>
@@ -156,8 +148,7 @@ const ReviewsSection = ({ setActiveTab }) => {
           )}
         </div>
 
-        {/* Reviews List or Empty State */}
-        {sortedReviews.length === 0 ? (
+        {reviews.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-6 text-center">
             <img
               src="/images/story set/amico.jpg"
@@ -174,40 +165,47 @@ const ReviewsSection = ({ setActiveTab }) => {
           </div>
         ) : (
           <>
-            <div className="space-y-6 ">
+            <div className="space-y-6">
               {sortedReviews.slice(0, visibleCount).map((review) => (
-                <div key={review.id} className="flex space-x-4 pb-4">
+                <div key={review.ratingId} className="flex space-x-4 pb-4">
                   <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-200 flex-shrink-0">
-                    {review.avatar ? (
+                    {review.reviewerAvatar ? (
                       <img
-                        src={review.avatar}
-                        alt={review.name}
-                        className="w-full h-full object-contain"
+                        src={review.reviewerAvatar}
+                        alt={review.reviewerName || 'Anonymous'}
+                        className="w-full h-full object-cover"
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-xl text-white bg-gray-400">
-                        {review.name.charAt(0)}
+                        {(review.reviewerName || 'A').charAt(0)}
                       </div>
                     )}
                   </div>
                   <div className="flex-1">
                     <div className="mb-1">
-                      <h4 className="font-semibold text-gray-900">{review.name}</h4>
+                      <h4 className="font-semibold text-gray-900">
+                        {review.reviewerName || 'Anonymous'}
+                      </h4>
                       <div className="flex items-center space-x-5 mt-1">
                         <div className="flex text-sm">
                           {[...Array(5)].map((_, i) => (
                             <FaStar
                               key={i}
-                              className={i < review.rating ? 'text-orange-500' : 'text-gray-300'}
+                              className={i < review.score ? 'text-orange-500' : 'text-gray-300'}
                             />
                           ))}
                         </div>
-                        <span className="text-xs text-gray-500">{review.date}</span>
+                        <span className="text-xs text-gray-500">
+                          {new Date(review.createdAt).toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric'
+                          })}
+                        </span>
                       </div>
                     </div>
                     <p className="text-gray-700 text-sm leading-relaxed">{review.comment}</p>
                   </div>
-
                 </div>
               ))}
             </div>
@@ -224,7 +222,6 @@ const ReviewsSection = ({ setActiveTab }) => {
             )}
           </>
         )}
-
       </div>
     </div>
   );

@@ -11,7 +11,7 @@ export default function NotFound() {
     <div className="flex flex-col items-center justify-center min-h-screen bg-white text-center px-4">
       <div className="relative w-full max-w-md h-[300px] sm:h-[400px] mb-6">
         <Image
-          src="/images/story set/not found.jpg"
+          src="/images/story set/not found.png"
           alt="404 Page Not Found"
           fill
           className="object-contain"

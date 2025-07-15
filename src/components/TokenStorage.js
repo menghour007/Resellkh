@@ -8,14 +8,18 @@ export default function TokenStorage() {
 
   useEffect(() => {
     const syncAuthData = () => {
+     
       if (status === "authenticated" && session?.accessToken) {
         localStorage.setItem("token", session.accessToken);
+
         localStorage.setItem("userId", session.user?.id || "");
         localStorage.setItem("email", session.user?.email || "");
         localStorage.setItem("role", session.user?.role || "USER");
         localStorage.setItem("firstName", session.user?.firstName || "");
         localStorage.setItem("lastName", session.user?.lastName || "");
         localStorage.setItem("profileImage", session.user?.image || "");
+        localStorage.removeItem("cachedUser");
+      localStorage.removeItem("bookmarks");
 
         window.dispatchEvent(new Event("auth-change"));
       }
@@ -27,7 +31,11 @@ export default function TokenStorage() {
         localStorage.removeItem("role");
         localStorage.removeItem("firstName");
         localStorage.removeItem("lastName");
+        localStorage.removeItem("userName")
         localStorage.removeItem("profileImage");
+        localStorage.removeItem("cachedUser");
+        
+      localStorage.removeItem("bookmarks");
 
         window.dispatchEvent(new Event("auth-change"));
       }

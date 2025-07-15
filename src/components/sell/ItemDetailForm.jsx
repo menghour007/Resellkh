@@ -1,4 +1,4 @@
-export default function ItemDetailForm({ title, setTitle, description, setDescription }) {
+export default function ItemDetailForm({ title,setTitle, productStatus, setProductStatus, description, setDescription }) {
   return (
     <div className="p-5 border rounded-3xl bg-white space-y-4">
       <p className="font-semibold text-[17px]">Item Detail</p>
@@ -9,6 +9,14 @@ export default function ItemDetailForm({ title, setTitle, description, setDescri
         placeholder="Listing title"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
+        className="w-full rounded-2xl bg-[#f1edef] px-5 py-3 placeholder-gray-500 text-gray-800 focus:outline-none"
+      />
+
+       <input
+        type="text"
+        placeholder="Listing status"
+        value={productStatus}
+        onChange={(e) => setProductStatus(e.target.value)}
         className="w-full rounded-2xl bg-[#f1edef] px-5 py-3 placeholder-gray-500 text-gray-800 focus:outline-none"
       />
 

@@ -1,7 +1,9 @@
+// ====== src/components/sell/PhotoUploader.js ======
 'use client';
 
 import { useState } from 'react';
-import { ImagePlus } from 'lucide-react';
+// Assuming ImagePlus is an SVG icon, it's fine.
+// import { ImagePlus } from 'lucide-react'; // If you're using lucide-react
 
 export default function PhotoUploader({ files, setFiles }) {
   const [isDragging, setIsDragging] = useState(false);
@@ -30,9 +32,32 @@ export default function PhotoUploader({ files, setFiles }) {
   };
 
   const addFiles = (newFiles) => {
-    const combined = [...files, ...newFiles];
-    const unique = Array.from(new Set(combined.map(f => f.name)))
-      .map(name => combined.find(f => f.name === name));
+    // Filter out any potential 'url' objects if new files are added
+    // and combine them with existing ones.
+    const currentLocalFiles = files.filter(f => f instanceof File);
+    const combined = [...currentLocalFiles, ...newFiles];
+
+    // Ensure uniqueness by name for new File objects.
+    // For existing URLs, they usually have unique 'id' or we treat them as unique.
+    const unique = [];
+    const seenNames = new Set();
+    const seenUrls = new Set(); // To handle uniqueness for existing draft URLs
+
+    // Add existing URLs first (if they are objects with a 'url' property)
+    files.forEach(f => {
+        if (typeof f === 'object' && f !== null && f.url && !seenUrls.has(f.url)) {
+            unique.push(f);
+            seenUrls.add(f.url);
+        }
+    });
+
+    // Add new File objects
+    newFiles.forEach(newFile => {
+        if (newFile instanceof File && !seenNames.has(newFile.name)) {
+            unique.push(newFile);
+            seenNames.add(newFile.name);
+        }
+    });
 
     const limited = unique.slice(0, 5); // Max 5 files
     setFiles(limited);
@@ -42,6 +67,16 @@ export default function PhotoUploader({ files, setFiles }) {
     const updated = [...files];
     updated.splice(index, 1);
     setFiles(updated);
+  };
+
+  // Helper function to get the correct image source
+  const getImageSrc = (file) => {
+    if (file instanceof File) {
+      return URL.createObjectURL(file); // For newly uploaded files
+    } else if (typeof file === 'object' && file !== null && file.url) {
+      return file.url; // For existing files loaded from a draft
+    }
+    return '/placeholder.png'; // Fallback
   };
 
   return (
@@ -63,8 +98,8 @@ export default function PhotoUploader({ files, setFiles }) {
             className="hidden"
           />
           <div className="mb-4">
-            {/* <ImagePlus className="w-12 h-12 text-gray-400 group-hover:text-orange-500" /> */}
-            <img src="/images/story set/image.jpg" alt="" className='w-[40px]' />
+            {/* Using a local image as placeholder icon */}
+            <img src="/images/story set/image.jpg" alt="Upload Icon" className='w-[40px]' />
           </div>
           <div className="mb-4">
             <span className="px-6 py-2 mt-2 bg-orange-500 text-white rounded-full hover:bg-orange-600 transition">
@@ -85,7 +120,7 @@ export default function PhotoUploader({ files, setFiles }) {
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-4">
             {files.map((file, index) => (
               <div
-                key={index}
+                key={typeof file === 'object' && file !== null && file.id ? file.id : index} // Use unique ID if available, else index
                 className="rounded-2xl overflow-hidden border bg-white shadow-sm relative"
               >
                 <div className="flex items-center justify-between px-3 py-2 border-b">
@@ -96,6 +131,7 @@ export default function PhotoUploader({ files, setFiles }) {
                     onClick={() => handleRemove(index)}
                     className="text-gray-500 hover:text-red-500 transition"
                   >
+                    {/* SVG for delete icon */}
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       className="h-4 w-4 text-gray-500"
@@ -113,7 +149,7 @@ export default function PhotoUploader({ files, setFiles }) {
                 </div>
 
                 <img
-                  src={URL.createObjectURL(file)}
+                  src={getImageSrc(file)} // Use the helper function to get source
                   alt={`preview-${index}`}
                   className="w-full h-48 object-cover"
                 />

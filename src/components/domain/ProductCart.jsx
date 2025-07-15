@@ -1,11 +1,15 @@
+// ProductCart.js
 "use client";
 
 import Image from "next/image";
 import { FaRegBookmark, FaBookmark } from "react-icons/fa";
-import { useBookmark } from "@/context/BookmarkContext";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { useBookmark } from "@/context/BookmarkContext";
+import { encryptId } from "@/utils/encryption";
+import { FaShoppingCart } from "react-icons/fa";
 
 export default function ProductCart({
   id,
@@ -16,11 +20,12 @@ export default function ProductCart({
   originalPrice = null,
   discountText = null,
 }) {
-  const { toggleBookmark, isBookmarked } = useBookmark();
+  const { toggleBookmark, isBookmarked, removeBookmark } = useBookmark();
+  const { data: session } = useSession();
   const bookmarked = isBookmarked(id);
   const router = useRouter();
-
   const [isAnimating, setIsAnimating] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
   const getDiscountPercent = () => {
     if (discountText) {
@@ -31,7 +36,24 @@ export default function ProductCart({
   };
 
   const handleToggle = (e) => {
-    e.stopPropagation(); // Prevent redirect
+    e.stopPropagation();
+
+    if (!session) {
+      if (bookmarked) {
+        removeBookmark(id);
+      }
+      router.push(`/login?callbackUrl=${encodeURIComponent(window.location.pathname)}`);
+      toast("Please login to save favorites", {
+        icon: "🔒",
+        style: {
+          borderRadius: "8px",
+          background: "#fff",
+          color: "#333",
+          padding: "8px 16px",
+        },
+      });
+      return;
+    }
 
     toggleBookmark({
       id,
@@ -45,44 +67,92 @@ export default function ProductCart({
 
     setIsAnimating(true);
     setTimeout(() => setIsAnimating(false), 300);
+  };
 
-    if (bookmarked) {
-      toast("Removed from favorites", {
-        icon: (
-          <svg
-            className="text-gray-600"
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-          >
-            <path
-              d="M21 5C21.5523 5 22 5.44772 22 6C22 6.55228 21.5523 7 21 7H3C2.44772 7 2 6.55228 2 6C2 5.44772 2.44772 5 3 5H21Z"
-              fill="currentColor"
-            />
-            <path
-              d="M4 20V6C4 5.44772 4.44772 5 5 5C5.55228 5 6 5.44772 6 6V20C6 20.2652 6.10543 20.5195 6.29297 20.707C6.48051 20.8946 6.73478 21 7 21H17C17.2652 21 17.5195 20.8946 17.707 20.707C17.8946 20.5195 18 20.2652 18 20V6C18 5.44772 18.4477 5 19 5C19.5523 5 20 5.44772 20 6V20C20 20.7957 19.6837 21.5585 19.1211 22.1211C18.5585 22.6837 17.7957 23 17 23H7C6.20435 23 5.44151 22.6837 4.87891 22.1211C4.3163 21.5585 4 20.7957 4 20ZM15 6V4C15 3.73478 14.8946 3.48051 14.707 3.29297C14.5195 3.10543 14.2652 3 14 3H10C9.73478 3 9.4805 3.10543 9.29297 3.29297C9.10543 3.48051 9 3.73478 9 4V6C9 6.55228 8.55228 7 8 7C7.44772 7 7 6.55228 7 6V4C7 3.20435 7.3163 2.44151 7.87891 1.87891C8.44152 1.3163 9.20435 1 10 1H14C14.7956 1 15.5585 1.3163 16.1211 1.87891C16.6837 2.44151 17 3.20435 17 4V6C17 6.55228 16.5523 7 16 7C15.4477 7 15 6.55228 15 6Z"
-              fill="currentColor"
-            />
-          </svg>
-        ),
-        style: { borderRadius: "8px", background: "#fff", color: "#333" },
+  const handleAddToCart = async (e) => {
+    e.stopPropagation();
+
+    if (!session) {
+      toast("Please login to add items to cart", {
+        icon: "🔒",
+        style: {
+          borderRadius: "8px",
+          background: "#fff",
+          color: "#333",
+          padding: "8px 16px",
+        },
       });
-    } else {
-      toast.success("Added to favorites");
+      router.push(`/login?callbackUrl=${encodeURIComponent(window.location.pathname)}`);
+      return;
+    }
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      toast.error("Authentication token not found. Please log in.");
+      return;
+    }
+    
+    // Quantity to add (default to 1)
+    const quantityToAdd = 1; 
+    const apiUrl = `https://phil-whom-hide-lynn.trycloudflare.com/api/v1/cart/add?productId=${id}&quantity=${quantityToAdd}`;
+
+    // --- OPTIMISTIC UI UPDATE: Dispatch event BEFORE API call ---
+    // Create a CustomEvent to pass data
+    const cartUpdatedEvent = new CustomEvent('cart-updated', {
+      detail: { type: 'increment', quantity: quantityToAdd }
+    });
+    window.dispatchEvent(cartUpdatedEvent); // Dispatch the event immediately
+
+    try {
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'accept': '*/*',
+          'Authorization': `Bearer ${token}`
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: 'Failed to add to cart due to server error.' }));
+        throw new Error(errorData.message || 'Failed to add to cart.');
+      }
+
+      const result = await response.json();
+      toast.success(result.message || "Product added to cart!");
+
+      // If API confirms, nothing more to do for count (it's already optimistically updated)
+      // If you need to re-sync with server's exact count, you could dispatch a 'refetch' event type here
+      // or check the response payload for a new total.
+
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+      toast.error(error.message || "Failed to add product to cart.");
+      // --- REVERT OPTIMISTIC UPDATE ON FAILURE ---
+      const cartRevertEvent = new CustomEvent('cart-updated', {
+        detail: { type: 'decrement', quantity: quantityToAdd } // Or 'refetch'
+      });
+      window.dispatchEvent(cartRevertEvent);
     }
   };
 
+
+  const encryptedProductId = encodeURIComponent(encryptId(id));
+
   const handleCardClick = () => {
-    router.push(`/product/${id}`);
+    router.push(`/product/${encryptedProductId}`);
   };
+
+  if (session === "loading") {
+    return null;
+  }
 
   return (
     <div
-      className="flex flex-col cursor-pointer bg-white rounded-2xl border border-gray-200 overflow-hidden transition-transform w-full sm:w-[240px] max-w-sm"
+      className="flex flex-col cursor-pointer bg-white rounded-2xl border border-gray-200 overflow-hidden transition-transform w-full sm:w-[240px] max-w-sm group"
       onClick={handleCardClick}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Image Section */}
       <div className="relative w-full aspect-[4/3] sm:h-[220px]">
         {discountText && (
           <div className="absolute top-2 left-2 bg-red-600 text-white text-[10px] font-semibold px-2 py-[2px] rounded-full z-10 shadow">
@@ -97,14 +167,25 @@ export default function ProductCart({
           style={{ objectFit: "cover" }}
           className="object-center"
         />
+
+        {/* Add to Cart Icon - positioned at top-1 right-2, visible on hover */}
+        <div className="absolute top-1 right-2 z-20">
+          <button
+            onClick={handleAddToCart}
+            className={`transition-opacity duration-300 p-2 rounded-full bg-[#F97316] text-white shadow-lg ${
+              isHovered ? 'opacity-100' : 'opacity-0'
+            } focus:outline-none focus:ring-2 focus:ring-[#F97316] focus:ring-opacity-75`}
+            aria-label="Add to cart"
+          >
+            <FaShoppingCart size={20} />
+          </button>
+        </div>
+
       </div>
 
-      {/* Content Section */}
       <div className="flex flex-col justify-between px-4 py-3 flex-grow">
         <div>
-          <h3 className="text-sm font-semibold text-gray-800 truncate">
-            {title}
-          </h3>
+          <h3 className="text-sm font-semibold text-gray-800 truncate">{title}</h3>
           <p className="mt-1 text-[13px] text-gray-600 leading-snug line-clamp-2 h-[35px]">
             {description}
           </p>
@@ -114,18 +195,21 @@ export default function ProductCart({
           <div className="flex items-baseline space-x-1">
             <span className="text-[#F97316] font-bold text-sm">${price}</span>
             {originalPrice && (
-              <span className="text-gray-400 line-through text-[13px]">
-                ${originalPrice}
-              </span>
+              <span className="text-gray-400 line-through text-[13px]">${originalPrice}</span>
             )}
           </div>
           <div
-            className={`cursor-pointer transition-transform duration-300 ${
+            className={`cursor-pointer relative group transition-transform duration-300 ${
               isAnimating ? "scale-125" : "scale-100"
             } ${bookmarked ? "text-orange-500" : "text-gray-400"}`}
             onClick={(e) => handleToggle(e)}
           >
             {bookmarked ? <FaBookmark size={18} /> : <FaRegBookmark size={18} />}
+            {!session && (
+              <span className="absolute hidden group-hover:block -top-8 -left-4 bg-gray-800 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
+                Login to save
+              </span>
+            )}
           </div>
         </div>
       </div>

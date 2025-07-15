@@ -1,81 +1,89 @@
 "use client";
 
-import { useState } from "react";
-import { FiSearch, FiFilter } from "react-icons/fi";
-import Cart from "@/components/profile/someComponent/Cart";
+import { useState, useEffect } from "react";
+import ProductCart from "../domain/ProductCart";
 
-const products = [
-  {
-    id: 1,
-    imageUrl: "/images/product/cropped_hoodie.jpg",
-    title: "Asics x Jound GT-2160 ",
-    description: "Lightly used, size 42. rtry rtytryy ttryryhr try ryrtjhjd hsrty rtytrshshgu erhugreut ertyrguy ryyu ygyuug yur yur gyugfguyg",
-    productPrice: 249,
-  },
-  {
-    id: 2,
-    imageUrl: "/images/product/av1.jpg",
-    title: "ASICS Gel Nimbus 26",
-    description: "No box, worn 3 times.",
-    productPrice: 180,
-    discountPercent: 15,
-  },
-  {
-    id: 3,
-    imageUrl: "/images/product/ck.jpg",
-    title: "Men Gel-Cumulus",
-    description: "In great condition.",
-    productPrice: 75,
-  },
-  {
-    id: 4,
-    imageUrl: "/images/product/ck zoom.jpg",
-    title: "cotton beige hoodies",
-    description:
-      "oversize hoodie. fast deal, clearing wardrobe selling as I don’t reach for it often",
-    productPrice: 20,
-    discountPercent: 10,
-  },
-  {
-    id: 5,
-    imageUrl: "/images/product/sbek jerng keng.jpg",
-    title: "COTTON Beige hoodies",
-    description:
-      "oversize hoodie. fast deal, clearing wardrobe selling as I don’t reach for it often",
-    productPrice: 20,
-    discountPercent: 10,
-  },
-  {
-    id: 6,
-    imageUrl: "/images/product/lb_puff.jpg",
-    title: "Cotton Beige hoodies",
-    description:
-      "oversize hoodie. fast deal, clearing wardrobe selling as I don’t reach for it often",
-    productPrice: 20,
-    discountPercent: 10,
-  },
-];
+// Skeleton Card Component
+const SkeletonCard = () => (
+  <div className="w-full animate-pulse bg-gray-100 p-4 rounded-lg">
+    <div className="aspect-square bg-gray-300 rounded-lg mb-3" />
+    <div className="h-4 bg-gray-300 rounded-full w-3/4 mb-2" />
+    <div className="h-3 bg-gray-200 rounded-full w-1/2 mb-1" />
+    <div className="h-4 bg-gray-300 rounded-full w-1/3" />
+  </div>
+);
 
-export default function ListingsWithFilter() {
+export default function ListingsWithFilter({ userId }) {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   const [searchTerm, setSearchTerm] = useState("");
   const [showFilter, setShowFilter] = useState(false);
   const [sortBy, setSortBy] = useState("");
   const [condition, setCondition] = useState("");
   const [status, setStatus] = useState("");
 
-  const toggleFilter = () => setShowFilter(!showFilter);
-  const resetFilters = () => {
-    setSortBy("");
-    setCondition("");
-    setStatus("");
-  };
+  useEffect(() => {
+    async function fetchProducts() {
+      setLoading(true);
+      setError(null);
 
+      try {
+        const token = localStorage.getItem("token");
+        if (!userId) throw new Error("User ID not provided");
+
+        const response = await fetch(
+          `https://phil-whom-hide-lynn.trycloudflare.com/api/v1/products/getproductbyuserid/${userId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch products");
+        }
+
+        const data = await response.json();
+
+        if (Array.isArray(data.payload)) {
+          const formattedProducts = data.payload.map(product => ({
+            ...product,
+            fileUrls: Array.isArray(product.fileUrls) 
+              ? product.fileUrls.map(url => 
+                  url.startsWith('http') ? url : `https://${url}`
+                )
+              : []
+          }));
+          setProducts(formattedProducts);
+        } else {
+          setProducts([]);
+        }
+      } catch (err) {
+        setError(err.message || "Unknown error");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchProducts();
+  }, [userId]);
+
+  // Filtering and sorting logic
   let filteredProducts = products.filter((p) => {
     const matchesSearch =
-      p.title.toLowerCase().includes(searchTerm.toLowerCase()) 
-      // || p.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCondition = !condition || p.condition === condition;
-    const matchesStatus = !status || p.status === status;
+      (p.productName && p.productName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (p.description && p.description.toLowerCase().includes(searchTerm.toLowerCase()));
+
+    const matchesCondition =
+      !condition ||
+      (p.condition && p.condition.toLowerCase().trim() === condition.toLowerCase().trim());
+
+    const matchesStatus =
+      !status || (p.productStatus && p.productStatus.toLowerCase() === status.toLowerCase());
+
     return matchesSearch && matchesCondition && matchesStatus;
   });
 
@@ -85,10 +93,39 @@ export default function ListingsWithFilter() {
     filteredProducts.sort((a, b) => a.productPrice - b.productPrice);
   }
 
+  if (loading) {
+    return (
+      <div className="p-4 md:p-6">
+        <div className="p-4 rounded-[24px] border border-gray-200">
+          {/* Header Skeleton */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+            <div className="h-6 w-32 bg-gray-200 rounded-full animate-pulse"></div>
+            <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+              <div className="relative w-full sm:max-w-xs">
+                <div className="h-10 bg-gray-200 rounded-full animate-pulse"></div>
+              </div>
+              <div className="h-10 w-24 bg-gray-200 rounded-full animate-pulse"></div>
+            </div>
+          </div>
+
+          {/* Product Grid Skeleton */}
+          <div className="grid grid-cols-2 sm:grid-cols-2 px-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 justify-items-center">
+            {[...Array(10)].map((_, index) => (
+              <SkeletonCard key={index} />
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return <div className="p-4 text-center text-red-500">Error: {error}</div>;
+  }
+
   return (
-    <>
     <div className="p-4 md:p-6">
-      <div className=" p-4 rounded-[24px] border border-gray-200">
+      <div className="p-4 rounded-[24px] border border-gray-200">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
           <h2 className="text-lg font-semibold text-gray-800">Listings</h2>
@@ -118,8 +155,8 @@ export default function ListingsWithFilter() {
 
             {/* Filter Button */}
             <button
-              onClick={toggleFilter}
-              className="flex items-center  justify-center gap-1 px-3 py-2 border border-gray-300 rounded-full text-sm text-gray-800 hover:bg-gray-100"
+              onClick={() => setShowFilter(!showFilter)}
+              className="flex items-center justify-center gap-1 px-3 py-2 border border-gray-300 rounded-full text-sm text-gray-800 hover:bg-gray-100"
             >
               Filters
               <svg
@@ -135,8 +172,6 @@ export default function ListingsWithFilter() {
                   fill="currentColor"
                 />
               </svg>
-
-
             </button>
           </div>
         </div>
@@ -146,25 +181,66 @@ export default function ListingsWithFilter() {
           <div className="relative z-50 w-full lg:right-[147px] md:absolute md:right-[110px] md:w-[310px] bg-white border rounded-2xl shadow p-4 mb-4 md:mb-0">
             <div className="text-sm font-medium text-gray-700 mb-2">Sort</div>
             <div className="space-y-1 mb-3">
-              <label className="block"><input type="radio" name="sort" value="" checked={sortBy === ""} onChange={() => setSortBy("")} /> Recent</label>
-              <label className="block"><input type="radio" name="sort" value="price-high" checked={sortBy === "price-high"} onChange={() => setSortBy("price-high")} /> Price - High to Low</label>
-              <label className="block"><input type="radio" name="sort" value="price-low" checked={sortBy === "price-low"} onChange={() => setSortBy("price-low")} /> Price - Low to High</label>
+              <label className="block">
+                <input
+                  type="radio"
+                  name="sort"
+                  value=""
+                  checked={sortBy === ""}
+                  onChange={() => setSortBy("")}
+                />{" "}
+                Recent
+              </label>
+              <label className="block">
+                <input
+                  type="radio"
+                  name="sort"
+                  value="price-high"
+                  checked={sortBy === "price-high"}
+                  onChange={() => setSortBy("price-high")}
+                />{" "}
+                Price - High to Low
+              </label>
+              <label className="block">
+                <input
+                  type="radio"
+                  name="sort"
+                  value="price-low"
+                  checked={sortBy === "price-low"}
+                  onChange={() => setSortBy("price-low")}
+                />{" "}
+                Price - Low to High
+              </label>
             </div>
 
             <div className="text-sm font-medium text-gray-700 mb-2">Item Condition</div>
             <div className="space-y-1 mb-3">
-              {['new', 'like', 'lightly', 'used', 'heavily'].map((c) => (
+              {["Brand New", "Like New", "Lightly Used", "Well Used", "Heavily Used"].map((c) => (
                 <label key={c} className="block">
-                  <input type="radio" name="condition" value={c} checked={condition === c} onChange={() => setCondition(c)} /> {c.charAt(0).toUpperCase() + c.slice(1)} used
+                  <input
+                    type="radio"
+                    name="condition"
+                    value={c}
+                    checked={condition === c}
+                    onChange={() => setCondition(c)}
+                  />{" "}
+                  {c.charAt(0).toUpperCase() + c.slice(1)} 
                 </label>
               ))}
             </div>
 
             <div className="text-sm font-medium text-gray-700 mb-2">Listings status</div>
             <div className="space-y-1 mb-3">
-              {['public', 'private', 'draft', 'sold'].map((s) => (
+              {["draft", "sold out", "on sale"].map((s) => (
                 <label key={s} className="block">
-                  <input type="radio" name="status" value={s} checked={status === s} onChange={() => setStatus(s)} /> {s}
+                  <input
+                    type="radio"
+                    name="status"
+                    value={s}
+                    checked={status === s}
+                    onChange={() => setStatus(s)}
+                  />{" "}
+                  {s}
                 </label>
               ))}
             </div>
@@ -172,7 +248,11 @@ export default function ListingsWithFilter() {
             <div className="flex justify-between mt-4">
               <button
                 className="text-sm text-gray-500 hover:underline"
-                onClick={resetFilters}
+                onClick={() => {
+                  setSortBy("");
+                  setCondition("");
+                  setStatus("");
+                }}
               >
                 Reset
               </button>
@@ -195,7 +275,7 @@ export default function ListingsWithFilter() {
               className="w-[350px] h-auto mb-6"
             />
             <p className="text-sm text-gray-600">
-              <span className="font-semibold">@leackhena12_Q</span> doesn’t have any listings yet
+              <span className="font-semibold">@user</span> doesn't have any listings yet
             </p>
           </div>
         ) : (
@@ -208,26 +288,24 @@ export default function ListingsWithFilter() {
                     : item.productPrice
                   : 0;
 
+              const firstImageUrl = item.fileUrls?.[0] || "/images/default-product.png";
+
               return (
-                <Cart
-                  key={item.id}
-                  id={item.id}
-                  imageUrl={item.imageUrl}
-                  title={item.title}
+                <ProductCart
+                  key={item.productId}
+                  id={item.productId}
+                  imageUrl={firstImageUrl}
+                  title={item.productName}
                   description={item.description}
                   price={price.toFixed(2)}
                   originalPrice={item.discountPercent ? item.productPrice : null}
-                  discountText={
-                    item.discountPercent ? `${item.discountPercent}% OFF` : null
-                  }
+                  discountText={item.discountPercent ? `${item.discountPercent}% OFF` : null}
                 />
               );
             })}
           </div>
         )}
       </div>
-      
     </div>
-    </>
   );
 }
