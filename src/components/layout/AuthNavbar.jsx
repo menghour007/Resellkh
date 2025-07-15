@@ -388,11 +388,11 @@ export default function AuthNavbar() {
 
                 <div className="relative" ref={profileRef}>
                   <img
-                    src={user.avatar}
+                    src={user.avatar || '/images/profile/Engelina.jpg'} 
                     alt="User Avatar"
                     width={32}
                     height={32}
-                    className="rounded-full object-cover cursor-pointer"
+                    className="rounded-full object-cover cursor-pointer w-[35px] h-[35px]"
                     onClick={() => setProfileOpen((prev) => !prev)}
                   />
                   {profileOpen && user && (
@@ -407,7 +407,7 @@ export default function AuthNavbar() {
                             alt="User Avatar"
                             width={50}
                             height={50}
-                            className="rounded-full object-cover"
+                            className="rounded-full object-cover w-[50px] h-[50px]"
                           />
                           <div>
                             <p className="text-sm font-medium text-gray-900">

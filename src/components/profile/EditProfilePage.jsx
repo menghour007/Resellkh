@@ -41,6 +41,22 @@ export default function EditProfilePage({ sellerId }) {
   const [selectedImage, setSelectedImage] = useState("/default-avatar.png");
   const [selectedCoverImage, setSelectedCoverImage] = useState("/cover.jpg");
 
+  const [ageError, setAgeError] = useState('');
+
+  // Function to calculate age from birthday
+  const calculateAge = (birthday) => {
+    const birthDate = new Date(birthday);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+
+    // Adjust age if birthday hasn't occurred this year
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  };
+
   // Get encrypted profile URL
   const getEncryptedProfileUrl = () => {
     try {
@@ -113,20 +129,33 @@ export default function EditProfilePage({ sellerId }) {
 
   const validateTelegramUsername = (username) => {
     if (!username) return false;
-    const cleanUsername = username.trim().startsWith('@') 
-      ? username.trim().slice(1) 
+    const cleanUsername = username.trim().startsWith('@')
+      ? username.trim().slice(1)
       : username.trim();
     const regex = /^[a-zA-Z][a-zA-Z0-9_]{4,31}$/;
     return regex.test(cleanUsername);
   };
 
+  // Merged handleChange function
   const handleChange = (field) => (e) => {
     const value = e?.target?.value ?? e;
     setFormData(prev => ({
-      ...prev, 
+      ...prev,
       [field]: value,
       ...(field === "location" ? { address: value } : {})
     }));
+
+    // Validate age for birthday field
+    if (field === 'birthday' && value) {
+      const age = calculateAge(value);
+      if (age < 12) {
+        setAgeError('Seller must be at least 12 years old.');
+      } else {
+        setAgeError('');
+      }
+    } else if (field === 'birthday') {
+      setAgeError('');
+    }
   };
 
   const handleFileChange = (e) => {
@@ -172,8 +201,8 @@ export default function EditProfilePage({ sellerId }) {
     formDataToSend.append("birthday", formData.birthday || "");
     formDataToSend.append("address", formData.address || "");
 
-    const cleanTelegram = formData.telegram.startsWith("@") 
-      ? formData.telegram.slice(1) 
+    const cleanTelegram = formData.telegram.startsWith("@")
+      ? formData.telegram.slice(1)
       : formData.telegram;
     formDataToSend.append("telegramUrl", `https://t.me/${cleanTelegram}`);
 
@@ -211,8 +240,8 @@ export default function EditProfilePage({ sellerId }) {
         localStorage.setItem("lastName", formData.lastName);
         localStorage.setItem("userName", formData.username);
 
-        const imageToStore = formData.profileImage instanceof File 
-          ? selectedImage 
+        const imageToStore = formData.profileImage instanceof File
+          ? selectedImage
           : "/default-avatar.png";
         localStorage.setItem("profileImage", imageToStore);
 
@@ -280,13 +309,13 @@ export default function EditProfilePage({ sellerId }) {
           </div>
 
           <div className="flex items-center gap-6 mb-10 mx-auto max-w-4xl">
-            <div className="relative">
+            <div className="relative ">
               <Image
                 src={selectedImage}
                 alt="avatar"
                 width={120}
                 height={120}
-                className="rounded-full border-4 border-white object-cover"
+                className="rounded-full object-cover w-[120px] h-[120px]"
               />
             </div>
             <div>
@@ -324,14 +353,14 @@ export default function EditProfilePage({ sellerId }) {
               />
             </Section>
 
-            <Section title="Business address">
+            {/* <Section title="Business address">
               <Link href="/location" className="flex items-center text-orange-500 font-medium">
                 <div className="w-6 h-6 bg-orange-500 rounded-full text-white flex items-center justify-center mr-2">
                   <Move className="w-4 h-4" />
                 </div>
                 Add Location
               </Link>
-            </Section>
+            </Section> */}
 
             <Section title="Telegram Username">
               <Input
@@ -378,14 +407,27 @@ export default function EditProfilePage({ sellerId }) {
                 value={formData.gender}
                 options={["Male", "Female", "Other"]}
                 onChange={handleChange("gender")}
+                dropdownHeight="120px"
               />
-              <Input label="Birthday" type="date" value={formData.birthday} onChange={handleChange("birthday")} />
+              <Input
+                label="Birthday"
+                type="date"
+                value={formData.birthday}
+                onChange={handleChange('birthday')}
+                max={new Date().toISOString().split('T')[0]}
+              />
+              {ageError && <p className="text-red-500 text-sm">{ageError}</p>}
+
             </Section>
 
             <div className="flex justify-end -mt-7 py-10">
               <button
                 onClick={handleSave}
-                className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-full text-sm"
+                disabled={ageError || !formData.birthday}
+                className={`px-6 py-2 rounded-full text-sm ${ageError || !formData.birthday
+                    ? 'bg-gray-400 cursor-not-allowed text-white'
+                    : 'bg-orange-500 hover:bg-orange-600 text-white'
+                  }`}
               >
                 Save Changes
               </button>
@@ -406,7 +448,22 @@ function Section({ title, children }) {
   );
 }
 
-function Input({ label, value, onChange, placeholder = "", type = "text" }) {
+// function Input({ label, value, onChange, placeholder = "", type = "text" }) {
+//   return (
+//     <div className="mb-4">
+//       {label && <label className="block text-sm font-semibold mb-1">{label}</label>}
+//       <input
+//         type={type}
+//         value={value || ""}
+//         onChange={onChange}
+//         placeholder={placeholder}
+//         className="w-full border h-[45px] rounded-[24px] border-gray-900 px-3 py-2 text-sm focus:outline-none focus:border-orange-400"
+//       />
+//     </div>
+//   );
+// }
+
+function Input({ label, value, onChange, placeholder = "", type = "text", ...rest }) {
   return (
     <div className="mb-4">
       {label && <label className="block text-sm font-semibold mb-1">{label}</label>}
@@ -416,10 +473,13 @@ function Input({ label, value, onChange, placeholder = "", type = "text" }) {
         onChange={onChange}
         placeholder={placeholder}
         className="w-full border h-[45px] rounded-[24px] border-gray-900 px-3 py-2 text-sm focus:outline-none focus:border-orange-400"
+        {...rest} // <-- support additional props like max
       />
     </div>
   );
 }
+
+
 
 function Textarea({ value, onChange, maxLength, placeholder = "" }) {
   return (
