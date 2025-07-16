@@ -231,7 +231,7 @@ export default function AuthNavbar() {
   };
 
   return (
-    <div className="w-full sticky top-0 z-[200] bg-white px-[7%] py-4">
+    <div className="w-full sticky top-0 z-[200] bg-white px-[7%] py-4 ">
       <div className="max-w-screen-full mx-auto flex flex-col gap-3">
         <div className="flex justify-between items-center">
           <img

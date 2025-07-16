@@ -1,11 +1,11 @@
 export const productService = {
   fetchRecommendedProducts: async () => {
     try {
-      const token = localStorage.getItem("token");
+      // const token = localStorage.getItem("token");
       const response = await fetch(
         "https://phil-whom-hide-lynn.trycloudflare.com/api/v1/products",
         {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
+          // headers: token ? { Authorization: `Bearer ${token}` } : {},
         }
       );
 

@@ -21,6 +21,10 @@
     "lucide-react": "^0.511.0",
     "next": "^15.3.4",
     "next-auth": "^4.24.11",
+<<<<<<< HEAD
+=======
+    "qrcode.react": "^4.2.0",
+>>>>>>> e0cd2369514a275d2c27e16b8a9de0ac5e29cd7d
     "react": "^19.0.0",
     "react-datepicker": "^8.4.0",
     "react-dom": "^19.0.0",

@@ -1,22 +1,25 @@
 // src/app/(main)/buy/payment/page.jsx
 "use client";
 
+<<<<<<< HEAD
 import React, { useState, useEffect, useCallback } from "react"; // Added useCallback
+=======
+import React, { useState, useEffect, useCallback } from "react";
+>>>>>>> e0cd2369514a275d2c27e16b8a9de0ac5e29cd7d
 import Image from "next/image";
-// Corrected import paths using aliases as per jsconfig.json
 import OrderSummary from "@/components/buy/OrderSummary";
-import Order from "@/components/buy/Order"; // This is your 'ShoppingCart' component
+import ShoppingCart from "@/components/buy/Order";
 
 // --- Skeleton Component for the cart page ---
 const CartPageSkeleton = () => (
   <main className="bg-gray-50 min-h-screen font-sans">
     <div className="container mx-auto px-4 py-8 lg:py-12">
       <div className="flex flex-col lg:flex-row lg:space-x-8 animate-pulse">
-        {/* Order Summary Skeleton (left side) */}
+        {/* Order Summary Skeleton */}
         <div className="w-full lg:w-1/2 bg-white p-6 lg:p-8 rounded-xl shadow-lg">
           <div className="h-8 bg-gray-200 rounded w-3/4 mb-6"></div>
           <div className="divide-y divide-gray-200">
-            {[1, 2, 3].map((i) => (
+            {[...Array(3)].map((_, i) => (
               <div key={i} className="flex items-center py-4">
                 <div className="w-20 h-20 bg-gray-200 rounded-md flex-shrink-0 mr-4"></div>
                 <div className="flex-grow space-y-2">
@@ -30,7 +33,7 @@ const CartPageSkeleton = () => (
           </div>
         </div>
 
-        {/* Order (Shopping Cart) Skeleton (right side) */}
+        {/* Shopping Cart Skeleton */}
         <div className="w-full lg:w-1/2 bg-white p-6 lg:p-8 rounded-xl shadow-lg mt-8 lg:mt-0">
           <div className="h-8 bg-gray-200 rounded w-3/4 mb-6"></div>
           <div className="space-y-4">
@@ -45,40 +48,36 @@ const CartPageSkeleton = () => (
     </div>
   </main>
 );
-// --- END NEW Skeleton Component ---
 
-
-export default function PaymentPage() {
-  const [items, setItems] = useState([]); // All items in the cart, managed by this page
+// --- Custom Hook for Fetching Cart Items ---
+const useCart = () => {
+  const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedItemsForOrder, setSelectedItemsForOrder] = useState([]); // Items passed to the Order component
 
-  useEffect(() => {
-    const storedToken = localStorage.getItem("token");
-    const storedUserId = localStorage.getItem("userId");
+  const fetchCartItems = useCallback(async () => {
+    setLoading(true);
+    setError(null);
 
-    if (!storedToken || !storedUserId) {
+    const token = localStorage.getItem("token");
+    const userId = localStorage.getItem("userId");
+
+    if (!token || !userId) {
       setLoading(false);
       setError(new Error("User ID or authentication token not found. Please log in."));
       return;
     }
 
-    const fetchCartItems = async () => {
-      try {
-        const response = await fetch(`https://phil-whom-hide-lynn.trycloudflare.com/api/v1/cart/user/${storedUserId}`, {
-          method: 'GET',
-          headers: {
-            'accept': '*/*',
-            'Authorization': `Bearer ${storedToken}`
-          }
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
-          throw new Error(`HTTP error! status: ${response.status} - ${errorData.message}`);
+    try {
+      const response = await fetch(`https://phil-whom-hide-lynn.trycloudflare.com/api/v1/cart/user/${userId}`, {
+        method: 'GET',
+        headers: {
+          'Accept': '*/*',
+          'Authorization': `Bearer ${token}`
         }
+      });
 
+<<<<<<< HEAD
         const data = await response.json();
 
         const transformedItems = data.payload.map(cartItem => ({
@@ -101,39 +100,73 @@ export default function PaymentPage() {
         console.error("Error fetching cart items:", e);
       } finally {
         setLoading(false);
+=======
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+        throw new Error(`HTTP error! status: ${response.status} - ${errorData.message}`);
+>>>>>>> e0cd2369514a275d2c27e16b8a9de0ac5e29cd7d
       }
-    };
 
-    fetchCartItems();
+      const data = await response.json();
+      
+      const transformedItems = data.payload.map(cartItem => ({
+        cartId: cartItem.cartId,
+        userId: cartItem.userId,
+        productId: cartItem.productId,
+        productName: cartItem.product?.productName || "Unknown Product",
+        productPrice: cartItem.product?.productPrice,
+        description: cartItem.product?.description,
+        condition: cartItem.product?.condition,
+        fileUrls: cartItem.product?.fileUrls || [],
+        quantity: cartItem.quantity,
+      }));
+
+      setItems(transformedItems);
+    } catch (e) {
+      setError(e);
+      console.error("Error fetching cart items:", e);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  // Handler for when an item is successfully removed via API call in OrderItem
-  const handleRemoveItem = (productIdToRemove) => {
-    setItems((currentItems) =>
-      currentItems.filter((item) => item.productId !== productIdToRemove)
-    );
-    // Also remove from selectedItemsForOrder if it was there
-    setSelectedItemsForOrder(prevSelected => prevSelected.filter(item => item.productId !== productIdToRemove));
-  };
+  useEffect(() => {
+    fetchCartItems();
+  }, [fetchCartItems]);
 
+<<<<<<< HEAD
   // Callback to receive selected items from OrderSummary
   const handleSelectedItemsChange = useCallback((itemsFromOrderSummary) => {
     setSelectedItemsForOrder(itemsFromOrderSummary);
   }, []); // Empty dependency array means this function is stable and won't cause re-renders
+=======
+  const removeItem = useCallback((productIdToRemove) => {
+    setItems(currentItems =>
+      currentItems.filter(item => item.productId !== productIdToRemove)
+    );
+  }, []);
+
+  return { items, loading, error, removeItem };
+};
+
+// --- Main BuyPage Component ---
+export default function BuyPage() {
+  const { items, loading, error, removeItem } = useCart();
+>>>>>>> e0cd2369514a275d2c27e16b8a9de0ac5e29cd7d
 
   if (loading) {
-    return <CartPageSkeleton />; // Render the skeleton when loading
+    return <CartPageSkeleton />;
   }
 
   if (error) {
     return (
       <main className="bg-gray-50 min-h-screen font-sans flex items-center justify-center">
-        <p className="text-red-600 text-lg">Error: {error.message}</p>
+        <p className="text-red-500 text-lg">Error: {error.message}</p>
       </main>
     );
   }
 
-  if (!loading && items.length === 0) {
+  if (items.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center min-h-screen">
         <Image
@@ -152,6 +185,7 @@ export default function PaymentPage() {
     <main className="bg-gray-50 min-h-screen font-sans">
       <div className="container mx-auto px-4 py-8 lg:py-12">
         <div className="flex flex-col lg:flex-row lg:space-x-8">
+<<<<<<< HEAD
           {/* OrderSummary receives all items and communicates selected items back */}
           <OrderSummary
             initialItems={items} // Pass all items here
@@ -160,6 +194,10 @@ export default function PaymentPage() {
           />
           {/* Order component is always rendered and receives the currently selected items */}
           <Order items={selectedItemsForOrder} />
+=======
+          <OrderSummary items={items} onRemove={removeItem} />
+          <ShoppingCart items={items} />
+>>>>>>> e0cd2369514a275d2c27e16b8a9de0ac5e29cd7d
         </div>
       </div>
     </main>
