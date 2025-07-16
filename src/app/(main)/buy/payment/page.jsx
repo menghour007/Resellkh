@@ -1,14 +1,9 @@
-// src/app/(main)/buy/payment/page.jsx
 "use client";
 
-<<<<<<< HEAD
-import React, { useState, useEffect, useCallback } from "react"; // Added useCallback
-=======
 import React, { useState, useEffect, useCallback } from "react";
->>>>>>> e0cd2369514a275d2c27e16b8a9de0ac5e29cd7d
 import Image from "next/image";
 import OrderSummary from "@/components/buy/OrderSummary";
-import ShoppingCart from "@/components/buy/Order";
+import Order from "@/components/buy/Order";
 
 // --- Skeleton Component for the cart page ---
 const CartPageSkeleton = () => (
@@ -77,38 +72,8 @@ const useCart = () => {
         }
       });
 
-<<<<<<< HEAD
-        const data = await response.json();
-
-        const transformedItems = data.payload.map(cartItem => ({
-          cartId: cartItem.cartId,
-          userId: cartItem.userId,
-          productId: cartItem.productId, // This MUST be unique and present
-          productName: cartItem.product?.productName || "Unknown Product",
-          productPrice: cartItem.product?.productPrice, // This MUST be a number
-          description: cartItem.product?.description,
-          condition: cartItem.product?.condition,
-          fileUrls: cartItem.product?.fileUrls || [],
-          quantity: cartItem.quantity, // This MUST be a number
-          // Add any other relevant product/cart item fields from your API response here
-          // that OrderItem or OrderSummary might need (e.g., storeName, originalPrice etc.)
-        }));
-
-        setItems(transformedItems);
-      } catch (e) {
-        setError(e);
-        console.error("Error fetching cart items:", e);
-      } finally {
-        setLoading(false);
-=======
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
-        throw new Error(`HTTP error! status: ${response.status} - ${errorData.message}`);
->>>>>>> e0cd2369514a275d2c27e16b8a9de0ac5e29cd7d
-      }
-
       const data = await response.json();
-      
+
       const transformedItems = data.payload.map(cartItem => ({
         cartId: cartItem.cartId,
         userId: cartItem.userId,
@@ -134,25 +99,25 @@ const useCart = () => {
     fetchCartItems();
   }, [fetchCartItems]);
 
-<<<<<<< HEAD
-  // Callback to receive selected items from OrderSummary
-  const handleSelectedItemsChange = useCallback((itemsFromOrderSummary) => {
-    setSelectedItemsForOrder(itemsFromOrderSummary);
-  }, []); // Empty dependency array means this function is stable and won't cause re-renders
-=======
-  const removeItem = useCallback((productIdToRemove) => {
+  // Remove item from cart
+  const handleRemoveItem = useCallback((productIdToRemove) => {
     setItems(currentItems =>
       currentItems.filter(item => item.productId !== productIdToRemove)
     );
   }, []);
 
-  return { items, loading, error, removeItem };
+  return { items, loading, error, handleRemoveItem };
 };
 
 // --- Main BuyPage Component ---
 export default function BuyPage() {
-  const { items, loading, error, removeItem } = useCart();
->>>>>>> e0cd2369514a275d2c27e16b8a9de0ac5e29cd7d
+  const { items, loading, error, handleRemoveItem } = useCart();
+  const [selectedItemsForOrder, setSelectedItemsForOrder] = useState([]);
+
+  // Callback to receive selected items from OrderSummary
+  const handleSelectedItemsChange = useCallback((itemsFromOrderSummary) => {
+    setSelectedItemsForOrder(itemsFromOrderSummary);
+  }, []);
 
   if (loading) {
     return <CartPageSkeleton />;
@@ -170,7 +135,7 @@ export default function BuyPage() {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center min-h-screen">
         <Image
-          src="/images/story set/no listings.jpg" // Ensure this path is correct in your public folder
+          src="/images/story set/no listings.jpg"
           alt="No Listings"
           width={350}
           height={350}
@@ -185,19 +150,14 @@ export default function BuyPage() {
     <main className="bg-gray-50 min-h-screen font-sans">
       <div className="container mx-auto px-4 py-8 lg:py-12">
         <div className="flex flex-col lg:flex-row lg:space-x-8">
-<<<<<<< HEAD
           {/* OrderSummary receives all items and communicates selected items back */}
           <OrderSummary
-            initialItems={items} // Pass all items here
+            initialItems={items}
             onRemove={handleRemoveItem}
-            onSelectedItemsChange={handleSelectedItemsChange} // New prop to get selected items
+            onSelectedItemsChange={handleSelectedItemsChange}
           />
-          {/* Order component is always rendered and receives the currently selected items */}
+          {/* Order component receives the currently selected items */}
           <Order items={selectedItemsForOrder} />
-=======
-          <OrderSummary items={items} onRemove={removeItem} />
-          <ShoppingCart items={items} />
->>>>>>> e0cd2369514a275d2c27e16b8a9de0ac5e29cd7d
         </div>
       </div>
     </main>
