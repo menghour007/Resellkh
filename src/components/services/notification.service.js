@@ -1,21 +1,20 @@
-// services/notificationService.js
 const API_BASE_URL = "https://phil-whom-hide-lynn.trycloudflare.com/api/v1";
 
+// ✅ Safe fetch with error handling
 export const fetchAllNotifications = async (token, userId) => {
-  const response = await fetch(
-    `${API_BASE_URL}/notifications/all/${userId}`,
-    {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
-  
+  const response = await fetch(`${API_BASE_URL}/notifications/all/${userId}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
   if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+    // Read response as text to avoid .json() crash
+    const errorText = await response.text();
+    throw new Error(errorText || `HTTP error! status: ${response.status}`);
   }
-  
+
   const data = await response.json();
   return data.payload || [];
 };
@@ -32,13 +31,14 @@ export const markNotificationAsRead = async (token, userId, notificationId) => {
   );
 
   if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+    const errorText = await response.text();
+    throw new Error(errorText || `HTTP error! status: ${response.status}`);
   }
-  
+
   return await response.json();
 };
 
-// Helper function to parse JWT token
+// ✅ JWT decode
 export const parseJwt = (token) => {
   try {
     return JSON.parse(atob(token.split(".")[1]));
@@ -47,7 +47,7 @@ export const parseJwt = (token) => {
   }
 };
 
-// Helper function to format timestamp
+// ✅ Timestamp formatting
 export const formatTimestamp = (timestamp) => {
   const now = new Date();
   const notificationDate = new Date(timestamp);

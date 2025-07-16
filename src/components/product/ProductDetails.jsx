@@ -34,7 +34,7 @@ const ProductDetails = ({ product }) => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">{productName}</h1>
+        <h1 className="text-[32px] font-bold text-gray-900 mb-2">{productName}</h1>
         <div className="flex items-center space-x-4">
           <span className="text-3xl font-bold text-orange-500">
             ${discountedPrice.toFixed(2)}
@@ -54,33 +54,47 @@ const ProductDetails = ({ product }) => {
 
       <div className="space-y-3">
         <div className="flex items-center">
-          <span className="font-medium text-gray-700 w-24">Condition:</span>
+          <span className="font-medium text-gray-900 w-24">Condition:</span>
           <span className="text-gray-600">{condition}</span>
         </div>
         <div className="flex items-center">
-          <span className="font-medium text-gray-700 w-24">Category:</span>
+          <span className="font-medium text-gray-900 w-24">Category:</span>
           <span className="text-gray-600">{categoryName}</span>
         </div>
         <div className="flex items-center">
-          <span className="font-medium text-gray-700 w-24">Status:</span>
+          <span className="font-medium text-gray-900 w-24">Status:</span>
           <span className="text-gray-600">{productStatus}</span>
         </div>
         <div className="flex items-center">
-          <span className="font-medium text-gray-700 w-24">Location:</span>
-          <span className="text-gray-600">{location}</span>
+          <span className="font-medium text-gray-900 w-24">Location:</span>
+          <span className="text-gray-600 ps-5 block">{location}</span>
         </div>
       </div>
       <div>
-        <h3 className="font-bold text-gray-900 mb-3">Description</h3>
-        <p className="text-gray-600 leading-relaxed">{displayedDescription}</p>
-        {isTruncated && (
-          <button
-            onClick={() => setIsExpanded(!isExpanded)}
-            className="mt-2 bg-orange-500 text-white px-6 py-2 rounded-full text-sm hover:bg-orange-600 transition-colors"
-          >
-            {isExpanded ? 'Read less' : 'Read more'}
-          </button>
-        )}
+        <h3 className="font-medium text-gray-900 mb-3">Description</h3>
+        <p className="text-gray-600 leading-relaxed">
+          {displayedDescription}
+          {isTruncated && (
+            <span
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="ml-1 text-orange-500 cursor-pointer hover:underline"
+            >
+              {isExpanded ? ' See less' : ' See more'}
+            </span>
+          )}
+        </p>
+
+        <button
+          className="mt-4 mr-2 bg-orange-500 text-white px-6 py-2 rounded-full text-[16px] hover:bg-orange-600 transition-colors"
+        >
+          Add to cart
+        </button>
+        <button
+
+          className="mt-4 bg-orange-500 text-white px-6 py-2 rounded-full text-[16px] hover:bg-orange-600 transition-colors"
+        >
+          Check out
+        </button>
       </div>
     </div>
   );

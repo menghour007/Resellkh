@@ -12,6 +12,7 @@ import { signOut } from "next-auth/react";
 import { encryptId } from "@/utils/encryption";
 import { Store, LayoutDashboard, ShoppingCart } from "lucide-react";
 import Image from "next/image"; // Import Image for user avatar
+import { parseJwt, fetchAllNotifications } from '@/components/services/notification.service'
 
 export default function AuthNavbar() {
   const [user, setUser] = useState(null);
@@ -46,6 +47,28 @@ export default function AuthNavbar() {
     { name: "Vehicle", key: "vehicle" },
     { name: "Other", key: "other" },
   ];
+
+  const [hasUnread, setHasUnread] = useState(false)
+
+  useEffect(() => {
+    const checkUnread = async () => {
+      try {
+        const token = localStorage.getItem('token')
+        const user = parseJwt(token)
+        const userId = user?.userId || user?.id
+
+        if (!token || !userId) return
+
+        const allNotifications = await fetchAllNotifications(token, userId)
+        const unreadExists = allNotifications.some(n => !n.isRead)
+        setHasUnread(unreadExists)
+      } catch (err) {
+        console.error('Error checking unread notifications:', err)
+      }
+    }
+
+    checkUnread()
+  }, [])
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -140,8 +163,8 @@ export default function AuthNavbar() {
             isSellerFormCompleted: data.payload?.seller || false,
             cartItemCount: data.payload?.cartItemCount || 0,
           };
-        
-          
+
+
           localStorage.setItem("cachedUser", JSON.stringify(userProfile));
           setUser(userProfile);
           setCartItemCount(userProfile.cartItemCount);
@@ -169,7 +192,7 @@ export default function AuthNavbar() {
         setCartItemCount(prevCount => Math.max(0, prevCount - event.detail.quantity));
       } else {
         // Fallback: If event type is unknown or just a generic 'cart-updated', refetch
-        fetchCartCount(); 
+        fetchCartCount();
       }
     };
 
@@ -382,13 +405,15 @@ export default function AuthNavbar() {
                         fill="none"
                       />
                     </svg>
-                    <span className="absolute left-3 -top-0 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full"></span>
+                    {hasUnread && (
+                      <span className="absolute left-3 -top-0 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full"></span>
+                    )}
                   </div>
                 </Link>
 
                 <div className="relative" ref={profileRef}>
                   <img
-                    src={user.avatar || '/images/profile/Engelina.jpg'} 
+                    src={user.avatar || '/images/profile/Engelina.jpg'}
                     alt="User Avatar"
                     width={32}
                     height={32}
@@ -503,29 +528,29 @@ export default function AuthNavbar() {
                     xmlns="http://www.w3.org/2000/svg"
                   >
                     <path d="M5.99829 4.75C5.99829 4.33579 6.33408 4 6.74829 4H17.2483C17.6625 4 17.9983 4.33579 17.9983 4.75C17.9983 5.16421 17.6625 5.5 17.2483 5.5H6.74829C6.33408 5.5 5.99829 5.16421 5.99829 4.75ZM5.99829 10C5.99829 9.58579 6.33408 9.25 6.74829 9.25H17.2483C17.6625 9.25 17.9983 9.58579 17.9983 10C17.9983 10.4142 17.6625 10.75 17.2483 10.75H6.74829C6.33408 10.75 5.99829 10.4142 5.99829 10ZM5.99829 15.25C5.99829 14.8358 6.33408 14.5 6.74829 14.5H17.2483C17.6625 14.5 17.9983 14.8358 17.9983 15.25C17.9983 15.6642 17.6625 16 17.2483 16H6.74829C6.33408 16 5.99829 15.6642 5.99829 15.25Z" />
-                  <path d="M1.98828 4.75C1.98828 4.19772 2.436 3.75 2.98828 3.75H2.99828C3.55057 3.75 3.99828 4.19772 3.99828 4.75V4.76C3.99828 5.31228 3.55057 5.76 2.99828 5.76H2.98828C2.436 5.76 1.98828 5.31228 1.98828 4.76V4.75Z" />
-                  <path d="M1.98828 15.25C1.98828 14.6977 2.436 14.25 2.98828 14.25H2.99828C3.55057 14.25 3.99828 14.6977 3.99828 15.25V15.26C3.99828 15.8123 3.55057 16.26 2.99828 16.26H2.98828C2.436 16.26 1.98828 15.8123 1.98828 15.26V15.25Z" />
-                  <path d="M1.98828 10C1.98828 9.44772 2.436 9 2.98828 9H2.99828C3.55057 9 3.99828 9.44772 3.99828 10V10.01C3.99828 10.5623 3.55057 11.01 2.99828 11.01H2.98828C2.436 11.01 1.98828 10.5623 1.98828 10.01V10Z" />
-                </svg>
-                <span className="group-hover:text-orange-500 transition-colors duration-200">
-                  All Categories
-                </span>
-              </button>
+                    <path d="M1.98828 4.75C1.98828 4.19772 2.436 3.75 2.98828 3.75H2.99828C3.55057 3.75 3.99828 4.19772 3.99828 4.75V4.76C3.99828 5.31228 3.55057 5.76 2.99828 5.76H2.98828C2.436 5.76 1.98828 5.31228 1.98828 4.76V4.75Z" />
+                    <path d="M1.98828 15.25C1.98828 14.6977 2.436 14.25 2.98828 14.25H2.99828C3.55057 14.25 3.99828 14.6977 3.99828 15.25V15.26C3.99828 15.8123 3.55057 16.26 2.99828 16.26H2.98828C2.436 16.26 1.98828 15.8123 1.98828 15.26V15.25Z" />
+                    <path d="M1.98828 10C1.98828 9.44772 2.436 9 2.98828 9H2.99828C3.55057 9 3.99828 9.44772 3.99828 10V10.01C3.99828 10.5623 3.55057 11.01 2.99828 11.01H2.98828C2.436 11.01 1.98828 10.5623 1.98828 10.01V10Z" />
+                  </svg>
+                  <span className="group-hover:text-orange-500 transition-colors duration-200">
+                    All Categories
+                  </span>
+                </button>
 
-              {categoryOpen && (
-                <div className="absolute z-50 mt-2 w-48 bg-white border rounded-xl shadow-lg py-2">
-                  {dropdownCategories.map((cat) => (
-                    <Link
-                      key={cat.key}
-                      href={`/category/${categoryMap[cat.key]}`}
-                      className="block px-4 py-2 hover:bg-gray-100 text-sm text-gray-700"
-                    >
-                      {cat.name}
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
+                {categoryOpen && (
+                  <div className="absolute z-50 mt-2 w-48 bg-white border rounded-xl shadow-lg py-2">
+                    {dropdownCategories.map((cat) => (
+                      <Link
+                        key={cat.key}
+                        href={`/category/${categoryMap[cat.key]}`}
+                        className="block px-4 py-2 hover:bg-gray-100 text-sm text-gray-700"
+                      >
+                        {cat.name}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
             </nav>
             <LocationDropdown />
             <SearchBar />
