@@ -1,7 +1,7 @@
 // src/app/(main)/buy/payment/page.jsx
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react"; // Added useCallback
 import Image from "next/image";
 // Corrected import paths using aliases as per jsconfig.json
 import OrderSummary from "@/components/buy/OrderSummary";
@@ -84,13 +84,13 @@ export default function PaymentPage() {
         const transformedItems = data.payload.map(cartItem => ({
           cartId: cartItem.cartId,
           userId: cartItem.userId,
-          productId: cartItem.productId,
+          productId: cartItem.productId, // This MUST be unique and present
           productName: cartItem.product?.productName || "Unknown Product",
-          productPrice: cartItem.product?.productPrice,
+          productPrice: cartItem.product?.productPrice, // This MUST be a number
           description: cartItem.product?.description,
           condition: cartItem.product?.condition,
           fileUrls: cartItem.product?.fileUrls || [],
-          quantity: cartItem.quantity,
+          quantity: cartItem.quantity, // This MUST be a number
           // Add any other relevant product/cart item fields from your API response here
           // that OrderItem or OrderSummary might need (e.g., storeName, originalPrice etc.)
         }));
@@ -116,13 +116,10 @@ export default function PaymentPage() {
     setSelectedItemsForOrder(prevSelected => prevSelected.filter(item => item.productId !== productIdToRemove));
   };
 
-  // Handler for when "Checkout Selected" is clicked in OrderSummary
-  const handleCheckoutSelected = (selectedItems) => {
-    // This function is called by OrderSummary with the items that are currently selected.
-    // We store these in `selectedItemsForOrder` state, which will then trigger
-    // the conditional rendering of the `Order` component.
-    setSelectedItemsForOrder(selectedItems);
-  };
+  // Callback to receive selected items from OrderSummary
+  const handleSelectedItemsChange = useCallback((itemsFromOrderSummary) => {
+    setSelectedItemsForOrder(itemsFromOrderSummary);
+  }, []); // Empty dependency array means this function is stable and won't cause re-renders
 
   if (loading) {
     return <CartPageSkeleton />; // Render the skeleton when loading
@@ -155,21 +152,14 @@ export default function PaymentPage() {
     <main className="bg-gray-50 min-h-screen font-sans">
       <div className="container mx-auto px-4 py-8 lg:py-12">
         <div className="flex flex-col lg:flex-row lg:space-x-8">
-          {/* OrderSummary receives all items and manages its own internal selection state */}
+          {/* OrderSummary receives all items and communicates selected items back */}
           <OrderSummary
             initialItems={items} // Pass all items here
             onRemove={handleRemoveItem}
-            onCheckoutSelected={handleCheckoutSelected} // This callback sets which items go to Order
+            onSelectedItemsChange={handleSelectedItemsChange} // New prop to get selected items
           />
-          {/* Order component is conditionally rendered and receives only the selected items */}
-          {selectedItemsForOrder.length > 0 ? (
-            <Order items={selectedItemsForOrder} />
-          ) : (
-            // Optionally, display a message or another component if no items are selected for order
-            <div className="w-full lg:w-1/2 p-6 lg:p-8 bg-white rounded-xl shadow-lg mt-8 lg:mt-0 flex items-center justify-center text-gray-500 text-center">
-                <p>Select items from the left to proceed to order.</p>
-            </div>
-          )}
+          {/* Order component is always rendered and receives the currently selected items */}
+          <Order items={selectedItemsForOrder} />
         </div>
       </div>
     </main>
